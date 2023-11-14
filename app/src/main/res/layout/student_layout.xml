@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="8dp"
+    app:cardCornerRadius="6dp"
+    android:padding="16dp"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="12dp"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/outStudentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:fontFamily="@font/ebgaramondbold"
+            android:text="Student Name Here"
+            android:textColor="@color/black"
+            android:gravity="top"/>
+
+        <TextView
+            android:id="@+id/outRollName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:fontFamily="@font/ebgaramondbold"
+            android:text="0000000000"
+            android:textColor="@color/black"
+            android:layout_below="@id/outStudentName"
+            android:layout_marginTop="4dp" />
+
+        <CheckBox
+            android:id="@+id/isAttended"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="9dp"
+            />
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

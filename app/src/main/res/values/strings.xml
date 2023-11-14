@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">AttendEase</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+
+    <string-array name="semester">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+
+    <string-array name="degree">
+        <item>BE</item>
+        <item>ME</item>
+        <item>PhD</item>
+    </string-array>
+
+    <string-array name="month">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+
+    <string-array name="monthName">
+        <item>"Jan"</item>
+        <item>"Feb"</item>
+        <item>"Mar"</item>
+        <item>"Apr"</item>
+        <item>"May"</item>
+        <item>"June"</item>
+        <item>"July"</item>
+        <item>"August"</item>
+        <item>"Sept"</item>
+        <item>"Oct"</item>
+        <item>"Nov"</item>
+        <item>"Dec"</item>
+    </string-array>
+
+</resources>

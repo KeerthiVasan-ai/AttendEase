@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/addClass"
+        android:title="Add Class"/>
+
+    <item
+        android:id="@+id/manageClass"
+        android:title="Manage Class"/>
+
+    <item
+        android:id="@+id/quickAttendance"
+        android:title="Quick Attendance"/>
+
+    <item
+        android:id="@+id/generateReport"
+        android:title="Generate Report"/>
+
+
+
+
+</menu>
