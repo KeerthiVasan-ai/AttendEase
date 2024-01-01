@@ -1,10 +1,11 @@
-package com.keerthi77459.attendease
+package com.keerthi77459.attendease.ui
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import com.keerthi77459.attendease.R
 
 class HomeScreen : AppCompatActivity() {
 
@@ -13,7 +14,7 @@ class HomeScreen : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this,MainActivity::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
         },3000)
     }
 }

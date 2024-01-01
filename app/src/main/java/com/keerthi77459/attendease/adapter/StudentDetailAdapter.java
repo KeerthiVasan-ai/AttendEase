@@ -1,4 +1,4 @@
-package com.keerthi77459.attendease;
+package com.keerthi77459.attendease.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
+import com.keerthi77459.attendease.R;
 
 import java.util.ArrayList;
 
