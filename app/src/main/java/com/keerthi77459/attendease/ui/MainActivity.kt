@@ -1,8 +1,6 @@
 package com.keerthi77459.attendease.ui
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -16,13 +14,12 @@ import com.google.android.material.navigation.NavigationView
 import com.keerthi77459.attendease.R
 import com.keerthi77459.attendease.adapter.ClassAdapter
 import com.keerthi77459.attendease.model.ClassData
-import com.keerthi77459.attendease.model.Logic
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var recycler1: RecyclerView
     private lateinit var classAdapter: ClassAdapter
-    private lateinit var sharedPreferences: SharedPreferences
+//    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +27,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
 
         val classData = ClassData(this)
-        val logic = Logic(this)
+//        val logic = Logic(this)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         drawerLayout = findViewById(R.id.drawerLayout)
@@ -62,9 +59,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         recycler1.adapter = classAdapter
         recycler1.layoutManager = LinearLayoutManager(this)
 
-        sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-        val lastDay: Int = sharedPreferences.getInt("LastRunClassDay", -1)
-        logic.initialLogic(sharedPreferences,lastDay)
+//        sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
+//        val lastDay: Int = sharedPreferences.getInt("LastRunClassDay", -1)
+//        logic.initialLogic(sharedPreferences,lastDay)
     }
 
 
