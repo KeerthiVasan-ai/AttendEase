@@ -5,15 +5,22 @@ on: pull_request
 jobs:
   build:
 
-     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-     steps:
-       - uses: actions/checkout@v1
+    steps:
+      - uses: actions/checkout@v3
 
-       - name: Set Up JDK
-        uses: actions/setup-java@v1
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 1.8
+          # See 'Supported distributions' for available options
+          java-version: '1.8'
+          cache: 'gradle'
+#
+#      # Run Tests Build
+#      - name: Run gradle tests
+#        run: ./gradlew test
 
-       - name: Run Build
-         run: ./gradlew assemble
+      # Create APK Release
+      - name: Build apk release module
+        run: ./gradlew assemble
