@@ -2,6 +2,7 @@ package com.keerthi77459.attendease.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -25,7 +26,9 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.keerthi77459.attendease.R;
 import com.keerthi77459.attendease.db.DbHelper;
 import com.keerthi77459.attendease.model.ClassData;
-import com.keerthi77459.attendease.model.ProcessExcel;
+import com.keerthi77459.attendease.utils.Utils;
+import com.keerthi77459.attendease.viewmodel.AlertDialogBox;
+import com.keerthi77459.attendease.viewmodel.ProcessExcel;
 
 public class AddClass extends AppCompatActivity {
 
@@ -36,6 +39,7 @@ public class AddClass extends AppCompatActivity {
     AutoCompleteTextView degreeName, yearName;
     TextInputLayout className;
     String[] semester, degree;
+    AlertDialog alert;
     private String degreeText, yearText,extension;
     Uri fileName;
 
@@ -46,6 +50,8 @@ public class AddClass extends AppCompatActivity {
 
         Resources resource = getResources();
         ClassData classData = new ClassData(AddClass.this);
+        Utils utils = new Utils();
+        AlertDialogBox alertDialogBox = new AlertDialogBox(this);
 
         semester = resource.getStringArray(R.array.semester);
         degree = resource.getStringArray(R.array.degree);
@@ -69,17 +75,19 @@ public class AddClass extends AppCompatActivity {
 
         degreeName.setOnItemClickListener((adapterView, view, i, l) -> degreeText = degreeName.getText().toString());
 
+        alert = alertDialogBox.displayDialog(utils.getADD_CLASS_MESSAGE());
+        alert.show();
 
         excel.setOnClickListener(v -> {
             System.out.println(yearText);
             System.out.println(degreeText);
 
-            if (ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//            if (ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+//                    ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 selectFile();
-            } else {
-                ActivityCompat.requestPermissions(AddClass.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
-            }
+//            } else {
+//                ActivityCompat.requestPermissions(AddClass.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+//            }
         });
 
         submit.setOnClickListener(view -> {
