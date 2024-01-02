@@ -31,6 +31,7 @@ class Logic(context: Context) {
 
             val editor : SharedPreferences.Editor = sharedPreferences.edit()
             editor.putLong("LastRunTime",utils.CURRENT_TIME)
+            editor.putString("LatestColumn",columnName)
             editor.apply()
 
             return 1
