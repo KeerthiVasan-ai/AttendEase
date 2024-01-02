@@ -17,10 +17,11 @@ jobs:
           java-version: 11
           cache: 'gradle'
 
-      # Create APK Release
+      # Build APK Release
       - name: Build apk release module
         run: ./gradlew assemble
 
+      # Create APK Release
       - name: Create Release
         uses: actions/create-release@v1
         with:
