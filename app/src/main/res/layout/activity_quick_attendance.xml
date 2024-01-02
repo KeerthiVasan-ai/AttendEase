@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".QuickAttendance">
+    tools:context=".ui.QuickAttendance">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -54,21 +54,23 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/qaClassNameField"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_marginTop="16dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
+                android:layout_marginTop="16dp"
                 android:layout_height="wrap_content"
-                android:hint="Class"
-                app:layout_constraintTop_toBottomOf="@id/qaDegreeNameField">
+                app:layout_constraintTop_toBottomOf="@id/qaDegreeNameField"
+                >
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:fontFamily="@font/ebgaramondmedium"
+                <AutoCompleteTextView
                     android:id="@+id/qaClassName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ebgaramondmedium"
+                    android:inputType="none"
+                    android:hint="Chose Class"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -91,6 +93,8 @@
                     android:hint="Chose Semester"/>
 
             </com.google.android.material.textfield.TextInputLayout>
+
+<!--            DETAILS   -->
 
             <TextView
                 android:id="@+id/text3"
@@ -154,5 +158,23 @@
 
     </androidx.cardview.widget.CardView>
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <!--            <com.google.android.material.textfield.TextInputLayout-->
+    <!--                android:id="@+id/qaClassNameField"-->
+    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
+    <!--                android:layout_marginTop="16dp"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:hint="Class"-->
+    <!--                app:layout_constraintTop_toBottomOf="@id/qaDegreeNameField">-->
+
+    <!--                <com.google.android.material.textfield.TextInputEditText-->
+    <!--                    android:fontFamily="@font/ebgaramondmedium"-->
+    <!--                    android:id="@+id/qaClassName"-->
+    <!--                    android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"/>-->
+
+    <!--            </com.google.android.material.textfield.TextInputLayout>-->
