@@ -9,11 +9,11 @@ open class DbHelper(context: Context) : SQLiteOpenHelper(context, Utils().DB_NAM
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL("CREATE TABLE ${Utils().TABLE_STUDENT_DETAIL} (" +
-                "rollNo TEXT PRIMARY KEY,name TEXT,degree TEXT,class TEXT,year INTEGER,phoneNumber TEXT,mode TEXT)")
+                "rollNo TEXT ,name TEXT,degree TEXT,class TEXT,year TEXT,phoneNumber TEXT,mode TEXT)")
         db?.execSQL("CREATE TABLE ${Utils().TABLE_CLASS_DETAIL}("+
                 "degree TEXT,class TEXT,year TEXT)")
         db?.execSQL("CREATE TABLE ${Utils().TABLE_ATTENDANCE_DETAIL}(" +
-                "rollNo TEXT PRIMARY KEY)")
+                "rollNo TEXT)")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
