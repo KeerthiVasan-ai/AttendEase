@@ -1,9 +1,8 @@
-package com.keerthi77459.attendease;
+package com.keerthi77459.attendease.ui;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -11,14 +10,18 @@ import android.os.Bundle;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
+import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.Toast;
 
-import com.google.android.material.textfield.TextInputLayout;
+import com.keerthi77459.attendease.R;
+import com.keerthi77459.attendease.db.DbHelper;
+import com.keerthi77459.attendease.model.ClassData;
+import com.keerthi77459.attendease.utils.Utils;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -30,15 +33,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 public class GenerateReport extends AppCompatActivity {
 
     Button downloadReport;
-    TextInputLayout inpClassName;
-    AutoCompleteTextView inpDegreeName, inpYearName;
-    String[] inpSemester, inpDegree;
-    private String inpDegreeText, inpYearText;
+    AutoCompleteTextView inpDegreeName, inpClassName,inpYearName;
+    private String inpDegreeText,inpClassText,inpYearText;
     DbHelper dbHelper;
+    Utils utils;
+    ClassData classData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,50 +50,37 @@ public class GenerateReport extends AppCompatActivity {
         setContentView(R.layout.activity_generate_report);
 
         dbHelper = new DbHelper(this);
+        classData = new ClassData(this);
+        utils = new Utils();
 
-        Resources resource = getResources();
-        inpSemester = resource.getStringArray(R.array.semester);
-        inpDegree = resource.getStringArray(R.array.degree);
+        classData.getClass();
 
         inpDegreeName = findViewById(R.id.inpDegreeName);
-        inpClassName = findViewById(R.id.inpClassNameField);
+        inpClassName = findViewById(R.id.inpClassName);
         inpYearName = findViewById(R.id.inpYearName);
         downloadReport = findViewById(R.id.downloadReport);
 
-        ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, inpDegree);
-        ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, inpSemester);
+        ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.degreeName);
+        ArrayAdapter<String> classAdapter = new ArrayAdapter<>(this,R.layout.drop_down_text,classData.className);
+        ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.yearName);
         inpYearName.setAdapter(semesterAdapter);
+        inpClassName.setAdapter(classAdapter);
         inpDegreeName.setAdapter(degreeAdapter);
 
-        inpYearName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                inpYearText = inpYearName.getText().toString();
-            }
-        });
+        inpYearName.setOnItemClickListener((adapterView, view, i, l) -> inpYearText = inpYearName.getText().toString());
 
-        inpDegreeName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                inpDegreeText = inpDegreeName.getText().toString();
-            }
-        });
+        inpClassName.setOnItemClickListener((adapterView, view, i, l) -> inpClassText = inpClassName.getText().toString());
 
-        downloadReport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                inpDegreeName.setError(null);
-                inpClassName.setError(null);
-                inpYearName.setError(null);
-                boolean valid = validate(inpDegreeText,
-                        String.valueOf(inpClassName.getEditText().getText()),
-                        inpYearText);
-                if (valid) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        getAllLocalUser(inpDegreeText,
-                                String.valueOf(inpClassName.getEditText().getText()),
-                                inpYearText);
-                    }
+        inpDegreeName.setOnItemClickListener((adapterView, view, i, l) -> inpDegreeText = inpDegreeName.getText().toString());
+
+        downloadReport.setOnClickListener(view -> {
+            inpDegreeName.setError(null);
+            inpClassName.setError(null);
+            inpYearName.setError(null);
+            boolean valid = validate(inpDegreeText, inpClassText ,inpYearText);
+            if (valid) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    getAllLocalUser(inpDegreeText, inpClassText ,inpYearText);
                 }
             }
         });
@@ -125,15 +116,18 @@ public class GenerateReport extends AppCompatActivity {
             rowIndex++;
         }
 
+//        TODO : CHANGE THE WORK IN ACADEMIC BASIS
+
         Sheet sheet1 = workbook.createSheet("MonthWiseDetails");
 
-        String[] months = getResources().getStringArray(R.array.month);
+        String[] resourceMonths = getResources().getStringArray(R.array.month);
+        String[] months = Arrays.copyOfRange(resourceMonths,0,utils.getCURRENT_MONTH());
         String[] monthNames = getResources().getStringArray(R.array.monthName);
         StringBuilder queryBuilder = new StringBuilder("SELECT rollNo,");
 
         for(String month : months) {
             queryBuilder.append("SUM(");
-            String testQuery = "SELECT name FROM pragma_table_info('attendanceDetail') WHERE name LIKE '_%_"+month+"'";
+            String testQuery = "SELECT name FROM pragma_table_info('attendanceDetail') WHERE name LIKE '_%_"+month+"_%_%_%'";
             Cursor cursor1 = database.rawQuery(testQuery, null);
             if(cursor1.moveToFirst()) {
                  do {
@@ -186,11 +180,7 @@ public class GenerateReport extends AppCompatActivity {
         StorageManager storageManager = (StorageManager) getSystemService(STORAGE_SERVICE);
         StorageVolume storageVolume = storageManager.getStorageVolumes().get(0);
 
-        String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME);
-        System.out.println(timeStamp);
-
-        String inpClassText = String.valueOf(inpClassName.getEditText().getText());
-        String fileName = inpDegreeText + "_" + inpClassText + "_" + inpYearText + ".xls";
+        String fileName = inpDegreeText + "_" + inpClassText + "_" + inpYearText + "_" + utils.getTIMESTAMP()+".xls";
         File output = new File(storageVolume.getDirectory().getPath() + "/Download/AttendEase/" + fileName);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(output);
@@ -216,8 +206,6 @@ public class GenerateReport extends AppCompatActivity {
         }
     }
 
-
-
     private boolean validate(String degreeText, String classText, String yearText) {
         if (degreeText == null) {
             inpDegreeName.setError("Select a Degree");
@@ -234,4 +222,5 @@ public class GenerateReport extends AppCompatActivity {
         }
         return true;
     }
+    
 }
