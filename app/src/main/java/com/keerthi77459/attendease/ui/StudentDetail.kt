@@ -3,12 +3,18 @@ package com.keerthi77459.attendease.ui
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +26,7 @@ import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.viewmodel.Logic
 import com.keerthi77459.attendease.model.StudentData
 import com.keerthi77459.attendease.utils.Utils
+import com.keerthi77459.attendease.viewmodel.AlertDialogBox
 import java.util.*
 
 class StudentDetail : AppCompatActivity() {
@@ -33,6 +40,9 @@ class StudentDetail : AppCompatActivity() {
     var attendanceInitialMode: String = Utils().ATTENDANCE_INITAL_STATUS
     var attendanceUpdatedMode: String = Utils().ATTENDANCE_UPDATED_STATUS
     lateinit var absentNumber: ArrayList<String>
+    private lateinit var builder: AlertDialog.Builder
+    private lateinit var v: View
+    private lateinit var dialog : AlertDialog
 
 //    NOTE : IF ATTENDANCE MODE = 1 : CHECKBOX WILL BE CONSIDERED AS PRESENT
 
@@ -45,6 +55,8 @@ class StudentDetail : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar!!.title = "Student Details"
 
+        builder = AlertDialog.Builder(this)
+        v = LayoutInflater.from(this).inflate(R.layout.fragement_alertbox,null)
         dbHelper = DbHelper(this)
         val studentData = StudentData(this)
         val utils = Utils()
@@ -79,7 +91,7 @@ class StudentDetail : AppCompatActivity() {
 
                 sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
                 val lastRunTime: Long = sharedPreferences.getLong("LastRunTime", -1)
-                println("Saved run Time$lastRunTime")
+
                 val isInitiated = logic.attendanceLogic(
                     sharedPreferences,
                     lastRunTime,
@@ -89,9 +101,9 @@ class StudentDetail : AppCompatActivity() {
                     outClassName,
                     outYearName
                 )
-                if (isInitiated == 1) {
+                absentNumber = studentDetailAdapter.attendedRoll
 
-                    absentNumber = studentDetailAdapter.attendedRoll
+                if (isInitiated == 1) {
 
                     for (absent in absentNumber) {
                         val contentValues1 = ContentValues()
@@ -106,7 +118,7 @@ class StudentDetail : AppCompatActivity() {
                     Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG).show()
                 } else {
 //                    TODO CREATE A ALERT MESSAGE
-                    Toast.makeText(this, "Make New Attendance After 45 Minutes", Toast.LENGTH_LONG).show()
+                    displayDialog(db,Utils().ATTENDANCE_UPDATE_WARNING)
                 }
             }
         } else {
@@ -131,25 +143,31 @@ class StudentDetail : AppCompatActivity() {
         }
         return true
     }
-}
+    private fun displayDialog(db:SQLiteDatabase,message:String){
 
-//                sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-//                val lastRunClassTime: Long = sharedPreferences.getLong("LastRunClassTime", -1)
-//
-//                logic.initialLogic2(sharedPreferences,lastRunClassTime)
-//                print("COLUMN CREATED")
-//                println(utils.COLUMN_NAME)
-////                sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-////                val lastDay: Int = sharedPreferences.getInt("LastRunStudentDay", -1)
-//
-//                sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-//                val lastRunStudentTime: Long = sharedPreferences.getLong("LastRunStudentTime", -1)
-//
-//                logic.specificLogic2(
-//                    sharedPreferences,
-//                    lastRunStudentTime,
-//                    attendanceInitialMode,
-//                    outDegreeName,
-//                    outClassName,
-//                    outYearName
-//                )
+        val displayView : TextView = v.findViewById(R.id.alertbox)
+        displayView.text = message
+        builder.setView(v)
+        builder.setTitle("WARNING")
+            .setPositiveButton("I ,Understood", DialogInterface.OnClickListener { _, _ ->
+                val latestColumnName :String = sharedPreferences.getString("LatestColumn",null)!!
+                absentNumber = studentDetailAdapter.attendedRoll
+
+                for (absent in absentNumber) {
+                    val contentValues1 = ContentValues()
+                    contentValues1.put(latestColumnName, attendanceUpdatedMode)
+                    db.update(
+                        "attendanceDetail", contentValues1,
+                        "rollNo=?",
+                        arrayOf(absent)
+                    )
+                }
+                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_LONG).show()
+            }).setNegativeButton("Cancel",DialogInterface.OnClickListener{_,_->
+                dialog.dismiss()
+            })
+        dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+    }
+}
