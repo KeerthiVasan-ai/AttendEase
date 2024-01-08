@@ -1,21 +1,20 @@
 package com.keerthi77459.attendease.ui;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import com.keerthi77459.attendease.R;
@@ -31,8 +30,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 public class GenerateReport extends AppCompatActivity {
@@ -79,20 +76,19 @@ public class GenerateReport extends AppCompatActivity {
             inpYearName.setError(null);
             boolean valid = validate(inpDegreeText, inpClassText ,inpYearText);
             if (valid) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     getAllLocalUser(inpDegreeText, inpClassText ,inpYearText);
-                }
+//                }
             }
         });
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.R)
+    
     public void getAllLocalUser(String inpDegreeName, String inpClassName, String inpYearName) {
 
         makeDir();
         Workbook workbook = new HSSFWorkbook();
 
-        Sheet sheet = workbook.createSheet("DayWiseDetails");
+        Sheet daySheet = workbook.createSheet("DayWiseDetails");
         SQLiteDatabase database = dbHelper.getReadableDatabase();
         String condition = "rollNo IN (SELECT rollNo FROM studentDetail WHERE degree = '" + inpDegreeName + "' AND class = '" + inpClassName + "' AND year = '" + inpYearName + "')";
         String query = "SELECT * FROM attendanceDetail WHERE " + condition;
@@ -100,7 +96,7 @@ public class GenerateReport extends AppCompatActivity {
         Cursor cursor = database.rawQuery(query, null);
         String[] columnNames = cursor.getColumnNames();
 
-        Row headerRow = sheet.createRow(0);
+        Row headerRow = daySheet.createRow(0);
         for (int i = 0; i < columnNames.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(columnNames[i]);
@@ -108,7 +104,7 @@ public class GenerateReport extends AppCompatActivity {
 
         int rowIndex = 1;
         while (cursor.moveToNext()) {
-            Row row = sheet.createRow(rowIndex);
+            Row row = daySheet.createRow(rowIndex);
             for (int i = 0; i < columnNames.length; i++) {
                 Cell cell = row.createCell(i);
                 cell.setCellValue(cursor.getString(i));
@@ -118,10 +114,11 @@ public class GenerateReport extends AppCompatActivity {
 
 //        TODO : CHANGE THE WORK IN ACADEMIC BASIS
 
-        Sheet sheet1 = workbook.createSheet("MonthWiseDetails");
+        Sheet monthSheet = workbook.createSheet("MonthWiseDetails");
 
         String[] resourceMonths = getResources().getStringArray(R.array.month);
         String[] months = Arrays.copyOfRange(resourceMonths,0,utils.getCURRENT_MONTH());
+        System.out.println(months.length);
         String[] monthNames = getResources().getStringArray(R.array.monthName);
         StringBuilder queryBuilder = new StringBuilder("SELECT rollNo,");
 
@@ -150,11 +147,9 @@ public class GenerateReport extends AppCompatActivity {
 
         Cursor resultCursor = database.rawQuery(query1,null);
 
-        //TODO : ADD THIS IN NEW SHEET
-
         String[] columnNames1 = resultCursor.getColumnNames();
 
-        Row headerRow1 = sheet1.createRow(0);
+        Row headerRow1 = monthSheet.createRow(0);
         for (int i = 0; i < columnNames1.length; i++) {
             Cell cell = headerRow1.createCell(i);
             cell.setCellValue(columnNames1[i]);
@@ -162,7 +157,7 @@ public class GenerateReport extends AppCompatActivity {
 
         int rowIndex1 = 1;
         while (resultCursor.moveToNext()) {
-            Row row1 = sheet1.createRow(rowIndex1);
+            Row row1 = monthSheet.createRow(rowIndex1);
             for (int i = 0; i < columnNames1.length; i++) {
                 Cell cell = row1.createCell(i);
                 cell.setCellValue(resultCursor.getString(i));
@@ -175,13 +170,21 @@ public class GenerateReport extends AppCompatActivity {
         saveFile(workbook);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
     private void saveFile(Workbook workbook) {
-        StorageManager storageManager = (StorageManager) getSystemService(STORAGE_SERVICE);
-        StorageVolume storageVolume = storageManager.getStorageVolumes().get(0);
+        String fileName = inpDegreeText + "_" + inpClassText + "_" + inpYearText + "_" + utils.getTIMESTAMP() + ".xls";
+        File output;
 
-        String fileName = inpDegreeText + "_" + inpClassText + "_" + inpYearText + "_" + utils.getTIMESTAMP()+".xls";
-        File output = new File(storageVolume.getDirectory().getPath() + "/Download/AttendEase/" + fileName);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // 12,13
+            String downloadDir = Environment.getExternalStorageDirectory().getPath();
+            output = new File(downloadDir+"/Download/AttendEase", fileName);
+        } else {
+            // 9,10,11
+            System.out.println("Entering");
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            output = new File(new File(downloadsDir,"AttendEase"), fileName);
+        }
+
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(output);
             workbook.write(fileOutputStream);
@@ -193,14 +196,26 @@ public class GenerateReport extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
     private void makeDir() {
-        StorageManager storageManager = (StorageManager) getSystemService(STORAGE_SERVICE);
-        StorageVolume storageVolume = storageManager.getStorageVolumes().get(0);
-        File folder = new File(storageVolume.getDirectory().getPath() + "/Download/", "AttendEase");
+        File folder;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            System.out.println(Build.VERSION.SDK_INT);
+            // 12 and 13
+            String downloadDir = Environment.getExternalStorageDirectory().getPath();
+            folder = new File(downloadDir, "AttendEase");
+        } else {
+            System.out.println(Build.VERSION.SDK_INT);
+            // 9,10,11
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            folder = new File(downloadsDir, "AttendEase");
+        }
         if (!folder.exists()) {
-            folder.mkdir();
-            Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+            if (folder.mkdirs()) {
+                Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+            } else {
+                Log.d("Message", "Failed to create directory");
+            }
         } else {
             Log.d("Message", "Exist");
         }
