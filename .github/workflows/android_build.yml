@@ -33,45 +33,15 @@ jobs:
         run: bash ./gradlew assembleRelease
 
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v1
         with:
-          name: app-release
-          path: app/build/outputs/apk/release/app-release.apk
+          name: app
+          path: app/build/outputs/apk/debug/app-debug.apk
 
-  release:
-
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download Release APK
-        uses: actions/download-artifact@v2
+      - name: Release with Notes
+        uses: softprops/action-gh-release@v1
         with:
-          name: app-release
-          path: app/build/outputs/apk/release/
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: v1.0.0
-          release_name: Release v1.0.0
-          body: Initial Release
-
-      - name: Upload Release APK to GitHub Release
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./app/build/outputs/apk/release/app-release.apk
-          asset_name: app-release.apk
-          asset_content_type: application/vnd.android.package-archive
-
-
-#      # Create APK Release
-#      - name: Create Release
-#        id: create_release
-#        uses: actions/create-release@v1
-#        with:
-#          tag_name: v1.0.3
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          tag_name: v1.0.1
+          files: app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
