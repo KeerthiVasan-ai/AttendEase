@@ -102,6 +102,7 @@ class StudentDetail : AppCompatActivity() {
                     outYearName
                 )
                 absentNumber = studentDetailAdapter.attendedRoll
+                println(absentNumber)
 
                 if (isInitiated == 1) {
 

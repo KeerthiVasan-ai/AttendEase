@@ -20,7 +20,7 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
     ArrayList<String> rollNo;
     ArrayList<String> name;
     ArrayList<String> phoneNumber;
-    ArrayList<String> attendedRoll;
+    private ArrayList<String> attendedRoll = new ArrayList<>();
 
     public StudentDetailAdapter(Context context, ArrayList<String> rollNo, ArrayList<String> name, ArrayList<String> phoneNumber) {
         this.context = context;
@@ -38,22 +38,24 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
 
     @Override
     public void onBindViewHolder(@NonNull StudentDetailViewHolder holder, int position) {
-        attendedRoll = new ArrayList<>();
+//        attendedRoll = new ArrayList<>();
         holder.outStudentName.setText(String.valueOf(name.get(position)));
         holder.outRollName.setText(String.valueOf(rollNo.get(position)));
         String value = rollNo.get(position);
         holder.isAttended.setText(value);
 
-        holder.isAttended.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(holder.isAttended.isChecked()){
-                    attendedRoll.add(value);
-                } else{
-                    attendedRoll.remove(value);
-                }
+        holder.isAttended.setOnCheckedChangeListener(null);
+        holder.isAttended.setChecked(attendedRoll.contains(value));
+
+        holder.isAttended.setOnCheckedChangeListener((b,c)->{
+            if(c){
+                attendedRoll.add(value);
+            } else{
+                attendedRoll.remove(value);
             }
+            notifyItemChanged(position);
         });
+
     }
 
     @Override
