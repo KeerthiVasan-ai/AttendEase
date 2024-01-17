@@ -8,8 +8,6 @@ open class Utils {
 
         val DB_NAME= "AttendEase.db"
         val DB_VERSION = 1
-        val TABLE_STUDENT_DETAIL = "studentDetail"
-        val TABLE_ATTENDANCE_DETAIL = "attendanceDetail"
         val TABLE_CLASS_DETAIL = "classDetail"
 
         val TIME_ZONE: TimeZone = TimeZone.getTimeZone("Asia/Kolkata")
