@@ -2,8 +2,6 @@ package com.keerthi77459.attendease.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +16,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.keerthi77459.attendease.R;
 import com.keerthi77459.attendease.db.DbHelper;
 import com.keerthi77459.attendease.ui.MainActivity;
-import com.keerthi77459.attendease.ui.StudentDetail;
 import com.keerthi77459.attendease.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHolder> {
+
     Context context;
     ArrayList<String> degreeName,className,yearName;
 
@@ -59,9 +56,8 @@ public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHold
 class ManageClassViewHolder extends RecyclerView.ViewHolder{
 
     TextView outDegreeName,outClassName,outYearName;
-    ImageButton delete;
     Utils utils = new Utils();
-    ArrayList<String> rollNo;
+    ImageButton delete;
 
     public ManageClassViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -71,8 +67,6 @@ class ManageClassViewHolder extends RecyclerView.ViewHolder{
         outClassName = itemView.findViewById(R.id.outClassName);
         outYearName = itemView.findViewById(R.id.outYearName);
 
-        rollNo = new ArrayList<String>();
-
         delete.setVisibility(View.VISIBLE);
 
         delete.setOnClickListener(view -> {
@@ -81,26 +75,19 @@ class ManageClassViewHolder extends RecyclerView.ViewHolder{
             String outClassText = outClassName.getText().toString();
             String outYearText = outYearName.getText().toString().split(":")[1];
 
+            String tableName = outDegreeText + "_" + outClassText + "_" + outYearText;
+            System.out.println(tableName);
+
             DbHelper dbHelper = new DbHelper(itemView.getContext());
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-            String condition = "rollNo IN (SELECT rollNo FROM studentDetail WHERE degree = '" + outDegreeText + "' AND class = '" + outClassText + "' AND year = '" + outYearText + "')";
-            String query = "SELECT rollNo FROM attendanceDetail WHERE " + condition;
-            System.out.println(query);
-            Cursor cursor = db.rawQuery(query, null);
-            while (cursor.moveToNext()){
-                rollNo.add(cursor.getString(0));
-            }
-
-            String whereClauses = "degree = ? AND class = ? AND year = ?";
+            String whereClause = "degree = ? AND class = ? AND year = ?";
             String[] whereArgs = {outDegreeText,outClassText,outYearText};
-            for(String roll : rollNo){
-                db.delete(utils.getTABLE_ATTENDANCE_DETAIL(),"rollNo = ?",new String[] {roll});
-            }
 
-            db.delete(utils.getTABLE_STUDENT_DETAIL(),whereClauses,whereArgs);
-            db.delete(utils.getTABLE_CLASS_DETAIL(),whereClauses,whereArgs);
-
+            String query = "DROP TABLE " + tableName;
+            System.out.println(query);
+            db.execSQL(query);
+            db.delete(utils.getTABLE_CLASS_DETAIL(),whereClause,whereArgs);
             db.close();
 
             Toast.makeText(itemView.getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
