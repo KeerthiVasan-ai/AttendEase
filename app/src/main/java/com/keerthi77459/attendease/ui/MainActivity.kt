@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var recycler1: RecyclerView
     private lateinit var classAdapter: ClassAdapter
-//    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +26,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
 
         val classData = ClassData(this)
-//        val logic = Logic(this)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         drawerLayout = findViewById(R.id.drawerLayout)
@@ -58,10 +56,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         recycler1.adapter = classAdapter
         recycler1.layoutManager = LinearLayoutManager(this)
-
-//        sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-//        val lastDay: Int = sharedPreferences.getInt("LastRunClassDay", -1)
-//        logic.initialLogic(sharedPreferences,lastDay)
     }
 
 
