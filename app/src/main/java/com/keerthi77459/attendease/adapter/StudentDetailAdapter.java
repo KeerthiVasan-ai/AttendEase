@@ -20,7 +20,7 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
     ArrayList<String> rollNo;
     ArrayList<String> name;
     ArrayList<String> phoneNumber;
-    private ArrayList<String> attendedRoll = new ArrayList<>();
+    private final ArrayList<String> attendedRoll = new ArrayList<>();
 
     public StudentDetailAdapter(Context context, ArrayList<String> rollNo, ArrayList<String> name, ArrayList<String> phoneNumber) {
         this.context = context;
@@ -47,8 +47,8 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
         holder.isAttended.setOnCheckedChangeListener(null);
         holder.isAttended.setChecked(attendedRoll.contains(value));
 
-        holder.isAttended.setOnCheckedChangeListener((b,c)->{
-            if(c){
+        holder.isAttended.setOnCheckedChangeListener((b,isChecked)->{
+            if(isChecked){
                 attendedRoll.add(value);
             } else{
                 attendedRoll.remove(value);

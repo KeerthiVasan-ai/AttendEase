@@ -1,12 +1,7 @@
 package com.keerthi77459.attendease.ui
 
-import android.annotation.SuppressLint
-import android.content.ContentValues
-import android.content.Context
-import android.content.DialogInterface
-import android.content.SharedPreferences
+import android.content.*
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -26,27 +21,25 @@ import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.viewmodel.Logic
 import com.keerthi77459.attendease.model.StudentData
 import com.keerthi77459.attendease.utils.Utils
-import com.keerthi77459.attendease.viewmodel.AlertDialogBox
 import java.util.*
 
 class StudentDetail : AppCompatActivity() {
 
-    lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var dbHelper: DbHelper
-    lateinit var recycler2: RecyclerView
-    lateinit var studentDetailAdapter: StudentDetailAdapter
-    lateinit var absentButton: Button
-    lateinit var switchMaterial: SwitchMaterial
-    var attendanceInitialMode: String = Utils().ATTENDANCE_INITAL_STATUS
-    var attendanceUpdatedMode: String = Utils().ATTENDANCE_UPDATED_STATUS
-    lateinit var absentNumber: ArrayList<String>
+    private lateinit var recycler2: RecyclerView
+    private lateinit var studentDetailAdapter: StudentDetailAdapter
+    private lateinit var absentButton: Button
+    private lateinit var switchMaterial: SwitchMaterial
+    private lateinit var tableName : String
+    private var attendanceInitialMode: String = Utils().ATTENDANCE_INITAL_STATUS   //1
+    private var attendanceUpdatedMode: String = Utils().ATTENDANCE_UPDATED_STATUS  //0
+    private lateinit var absentNumber: ArrayList<String>
     private lateinit var builder: AlertDialog.Builder
     private lateinit var v: View
     private lateinit var dialog : AlertDialog
 
-//    NOTE : IF ATTENDANCE MODE = 1 : CHECKBOX WILL BE CONSIDERED AS PRESENT
 
-    @SuppressLint("Recycle")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_student_detail)
@@ -62,8 +55,6 @@ class StudentDetail : AppCompatActivity() {
         val utils = Utils()
         val logic = Logic(this)
 
-//        logic.initialLogic(sharedPreferences, lastDay)
-        println(utils.COLUMN_NAME)
         absentNumber = ArrayList()
         absentButton = findViewById(R.id.absent)
 
@@ -71,7 +62,10 @@ class StudentDetail : AppCompatActivity() {
         val outDegreeName: String = sharedPreferences.getString("outDegreeName", null)!!
         val outClassName: String = sharedPreferences.getString("outClassName", null)!!
         val outYearName: String = sharedPreferences.getString("outYearName", null)!!
-        val isFetched = studentData.getStudentDetails(outDegreeName, outClassName, outYearName)
+
+        tableName = outDegreeName + "_" + outClassName + "_" + outYearName
+
+        val isFetched = studentData.getStudentDetails(tableName)
         if (isFetched == 1) {
 
             recycler2 = findViewById(R.id.recycle2)
@@ -91,15 +85,15 @@ class StudentDetail : AppCompatActivity() {
 
                 sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
                 val lastRunTime: Long = sharedPreferences.getLong("LastRunTime", -1)
+                val lastTableName: String = sharedPreferences.getString("LastTableName","class")!!
 
                 val isInitiated = logic.attendanceLogic(
                     sharedPreferences,
                     lastRunTime,
+                    lastTableName,
+                    tableName,
                     attendanceInitialMode,
-                    utils.COLUMN_NAME,
-                    outDegreeName,
-                    outClassName,
-                    outYearName
+                    utils.COLUMN_NAME
                 )
                 absentNumber = studentDetailAdapter.attendedRoll
                 println(absentNumber)
@@ -110,7 +104,7 @@ class StudentDetail : AppCompatActivity() {
                         val contentValues1 = ContentValues()
                         contentValues1.put(utils.COLUMN_NAME, attendanceUpdatedMode)
                         db.update(
-                            "attendanceDetail", contentValues1,
+                            tableName, contentValues1,
                             "rollNo=?",
                             arrayOf(absent)
                         )
@@ -144,29 +138,34 @@ class StudentDetail : AppCompatActivity() {
         }
         return true
     }
+
     private fun displayDialog(db:SQLiteDatabase,message:String){
 
         val displayView : TextView = v.findViewById(R.id.alertbox)
         displayView.text = message
         builder.setView(v)
         builder.setTitle("WARNING")
-            .setPositiveButton("I ,Understood", DialogInterface.OnClickListener { _, _ ->
-                val latestColumnName :String = sharedPreferences.getString("LatestColumn",null)!!
+            .setPositiveButton("I ,Understood") { _, _ ->
+                val latestColumnName: String = sharedPreferences.getString("LatestColumn", null)!!
                 absentNumber = studentDetailAdapter.attendedRoll
 
                 for (absent in absentNumber) {
                     val contentValues1 = ContentValues()
                     contentValues1.put(latestColumnName, attendanceUpdatedMode)
                     db.update(
-                        "attendanceDetail", contentValues1,
+                        tableName, contentValues1,
                         "rollNo=?",
                         arrayOf(absent)
                     )
                 }
+                println(absentNumber)
                 Toast.makeText(this, "Attendance Updated", Toast.LENGTH_LONG).show()
-            }).setNegativeButton("Cancel",DialogInterface.OnClickListener{_,_->
+                startActivity(Intent(this, MainActivity::class.java))
+
+            }.setNegativeButton("Cancel") { _, _ ->
                 dialog.dismiss()
-            })
+                startActivity(Intent(this, MainActivity::class.java))
+            }
         dialog = builder.create()
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
