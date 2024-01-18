@@ -27,6 +27,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,8 +36,8 @@ import java.util.Arrays;
 public class GenerateReport extends AppCompatActivity {
 
     Button downloadReport;
-    AutoCompleteTextView inpDegreeName, inpClassName,inpYearName;
-    private String inpDegreeText,inpClassText,inpYearText;
+    AutoCompleteTextView inpDegreeName, inpClassName, inpYearName;
+    private String inpDegreeText, inpClassText, inpYearText;
     DbHelper dbHelper;
     Utils utils;
     ClassData classData;
@@ -58,41 +59,39 @@ public class GenerateReport extends AppCompatActivity {
         downloadReport = findViewById(R.id.downloadReport);
 
         ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.degreeName);
-        ArrayAdapter<String> classAdapter = new ArrayAdapter<>(this,R.layout.drop_down_text,classData.className);
+        ArrayAdapter<String> classAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.className);
         ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.yearName);
         inpYearName.setAdapter(semesterAdapter);
         inpClassName.setAdapter(classAdapter);
         inpDegreeName.setAdapter(degreeAdapter);
 
         inpYearName.setOnItemClickListener((adapterView, view, i, l) -> inpYearText = inpYearName.getText().toString());
-
         inpClassName.setOnItemClickListener((adapterView, view, i, l) -> inpClassText = inpClassName.getText().toString());
-
         inpDegreeName.setOnItemClickListener((adapterView, view, i, l) -> inpDegreeText = inpDegreeName.getText().toString());
 
         downloadReport.setOnClickListener(view -> {
             inpDegreeName.setError(null);
             inpClassName.setError(null);
             inpYearName.setError(null);
-            boolean valid = validate(inpDegreeText, inpClassText ,inpYearText);
+            boolean valid = validate(inpDegreeText, inpClassText, inpYearText);
             if (valid) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    getAllLocalUser(inpDegreeText, inpClassText ,inpYearText);
-//                }
+                getAllLocalUser(inpDegreeText, inpClassText, inpYearText);
             }
         });
     }
-    
+
     public void getAllLocalUser(String inpDegreeName, String inpClassName, String inpYearName) {
 
         makeDir();
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
         Workbook workbook = new HSSFWorkbook();
+        String tableName = inpDegreeName + "_" + inpClassName + "_" + inpYearName;
+
 
         Sheet daySheet = workbook.createSheet("DayWiseDetails");
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-        String condition = "rollNo IN (SELECT rollNo FROM studentDetail WHERE degree = '" + inpDegreeName + "' AND class = '" + inpClassName + "' AND year = '" + inpYearName + "')";
-        String query = "SELECT * FROM attendanceDetail WHERE " + condition;
-        System.out.println(query);
+        String query = dbHelper.fetchAttendanceDetails(tableName);
+
+        Log.d("DailyWiseQuery",query);
         Cursor cursor = database.rawQuery(query, null);
         String[] columnNames = cursor.getColumnNames();
 
@@ -112,40 +111,42 @@ public class GenerateReport extends AppCompatActivity {
             rowIndex++;
         }
 
+        cursor.close();
+
 //        TODO : CHANGE THE WORK IN ACADEMIC BASIS
 
         Sheet monthSheet = workbook.createSheet("MonthWiseDetails");
 
         String[] resourceMonths = getResources().getStringArray(R.array.month);
-        String[] months = Arrays.copyOfRange(resourceMonths,0,utils.getCURRENT_MONTH());
+        String[] months = Arrays.copyOfRange(resourceMonths, 0, utils.getCURRENT_MONTH());
         System.out.println(months.length);
         String[] monthNames = getResources().getStringArray(R.array.monthName);
         StringBuilder queryBuilder = new StringBuilder("SELECT rollNo,");
 
-        for(String month : months) {
+        for (String month : months) {
             queryBuilder.append("SUM(");
-            String testQuery = "SELECT name FROM pragma_table_info('attendanceDetail') WHERE name LIKE '_%_"+month+"_%_%_%'";
+            String testQuery = "SELECT name FROM pragma_table_info('" + tableName + "') WHERE name LIKE '_%_" + month + "_%_%_%'";
             Cursor cursor1 = database.rawQuery(testQuery, null);
-            if(cursor1.moveToFirst()) {
-                 do {
+            if (cursor1.moveToFirst()) {
+                do {
                     String columnName = cursor1.getString(0);
                     System.out.println(columnName);
-                    queryBuilder.append("COALESCE("+columnName + ",0) + ");
+                    queryBuilder.append("COALESCE(").append(columnName).append(",0) + ");
                 } while (cursor1.moveToNext());
             } else {
                 queryBuilder.append("0 + ");
             }
             queryBuilder.setLength(queryBuilder.length() - 3);
-            queryBuilder.append(") AS "+monthNames[Integer.parseInt(month)-1]+", ");
+            queryBuilder.append(") AS ").append(monthNames[Integer.parseInt(month) - 1]).append(", ");
             cursor1.close();
         }
         queryBuilder.setLength(queryBuilder.length() - 2);
-        queryBuilder.append(" FROM attendanceDetail GROUP BY rollNo HAVING "+condition);
+        queryBuilder.append(" FROM ").append(tableName).append(" GROUP BY rollNo");
 
         String query1 = queryBuilder.toString();
-        System.out.println(query1);
+        Log.d("MonthWiseQuery",query1);
 
-        Cursor resultCursor = database.rawQuery(query1,null);
+        Cursor resultCursor = database.rawQuery(query1, null);
 
         String[] columnNames1 = resultCursor.getColumnNames();
 
@@ -177,12 +178,11 @@ public class GenerateReport extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // 12,13
             String downloadDir = Environment.getExternalStorageDirectory().getPath();
-            output = new File(downloadDir+"/Download/AttendEase", fileName);
+            output = new File(downloadDir + "/Download/AttendEase", fileName);
         } else {
             // 9,10,11
-            System.out.println("Entering");
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            output = new File(new File(downloadsDir,"AttendEase"), fileName);
+            output = new File(new File(downloadsDir, "AttendEase"), fileName);
         }
 
         try {
@@ -197,19 +197,11 @@ public class GenerateReport extends AppCompatActivity {
     }
 
     private void makeDir() {
-        File folder;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            System.out.println(Build.VERSION.SDK_INT);
-            // 12 and 13
-            String downloadDir = Environment.getExternalStorageDirectory().getPath();
-            folder = new File(downloadDir, "AttendEase");
-        } else {
-            System.out.println(Build.VERSION.SDK_INT);
-            // 9,10,11
-            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            folder = new File(downloadsDir, "AttendEase");
-        }
+        File folder;
+        File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        folder = new File(downloadsDir, "AttendEase");
+
         if (!folder.exists()) {
             if (folder.mkdirs()) {
                 Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
@@ -237,5 +229,4 @@ public class GenerateReport extends AppCompatActivity {
         }
         return true;
     }
-    
 }
