@@ -13,4 +13,33 @@ open class DbHelper(context: Context) : SQLiteOpenHelper(context, Utils().DB_NAM
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
+
+    fun fetchAttendanceDetails(tableName: String): String {
+        val columnsToExclude = arrayOf("name", "degree", "class", "year", "phoneNumber", "mode")
+        return "SELECT ${buildIncludedColumns(columnsToExclude, tableName)} FROM $tableName"
+    }
+
+
+    private fun buildIncludedColumns(columnsToExclude: Array<String>, tableName:String): String {
+        val cursor = readableDatabase.rawQuery("PRAGMA table_info($tableName)",null)
+        val includedColumn = StringBuilder()
+        while (cursor.moveToNext()){
+            val nameIndex = cursor.getColumnIndex("name")
+            if (nameIndex > 0) {
+                val columnName = cursor.getString(nameIndex)
+                if (!contain(columnsToExclude, columnName)) {
+                    if (includedColumn.isNotEmpty()) {
+                        includedColumn.append(",")
+                    }
+                    includedColumn.append(columnName)
+                }
+            }
+        }
+        cursor.close()
+        return includedColumn.toString()
+    }
+
+    private fun contain(columnsToExclude: Array<String>, columnName: String?): Boolean {
+        return columnsToExclude.any {it == columnName}
+    }
 }
