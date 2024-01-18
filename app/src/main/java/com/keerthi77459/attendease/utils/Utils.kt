@@ -8,17 +8,15 @@ open class Utils {
 
         val DB_NAME= "AttendEase.db"
         val DB_VERSION = 1
-        val TABLE_STUDENT_DETAIL = "studentDetail"
-        val TABLE_ATTENDANCE_DETAIL = "attendanceDetail"
         val TABLE_CLASS_DETAIL = "classDetail"
 
         val TIME_ZONE: TimeZone = TimeZone.getTimeZone("Asia/Kolkata")
         val CALENDER: Calendar = Calendar.getInstance(TIME_ZONE)
-        val CURRENT_DAY: Int = CALENDER.get(Calendar.DAY_OF_YEAR)
+        val CURRENT_YEAR: Int = CALENDER.get(Calendar.YEAR)
         val CURRENT_DATE: Int = CALENDER.get(Calendar.DATE)
         val CURRENT_MONTH: Int = CALENDER.get(Calendar.MONTH) + 1
         var TIMESTAMP :String = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME).split(".")[0].replace(":","_")
-        val COLUMN_NAME = "_" + CURRENT_DATE.toString() + "_" + CURRENT_MONTH.toString() + "_" + TIMESTAMP
+        val COLUMN_NAME = "_" + CURRENT_DATE.toString() + "_" + CURRENT_MONTH.toString() + "_" + CURRENT_YEAR.toString() + "_" + TIMESTAMP
         var CURRENT_TIME: Long = System.currentTimeMillis()
         var COMPARISON_CONSTANT: Long = 45 * 60 * 1000
 

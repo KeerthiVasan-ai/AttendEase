@@ -11,16 +11,14 @@ class StudentData(context:Context) {
     lateinit var phoneNumber: ArrayList<String>
     private val dbHelper = DbHelper(context)
 
-     fun getStudentDetails(degreeName: String, className: String, yearName: String):Int {
-        println(degreeName)
-        println(className)
-        println(yearName)
+     fun getStudentDetails(tableName : String):Int {
+        println(tableName)
 
         rollNo = ArrayList()
         name = ArrayList()
         phoneNumber = ArrayList()
         val db = dbHelper.readableDatabase
-        val query = "SELECT * FROM studentDetail WHERE degree = '$degreeName' AND class = '$className' AND year = '$yearName'"
+        val query = "SELECT * FROM $tableName"
         val cursor: Cursor = db.rawQuery(query, null)
         if (cursor.count == 0) {
             return 0
@@ -31,6 +29,7 @@ class StudentData(context:Context) {
                 phoneNumber.add(cursor.getString(5))
             }
         }
+        cursor.close()
         return 1
     }
 }

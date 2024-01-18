@@ -42,22 +42,13 @@ class MapRoll(context: Context) {
             0
         } else {
             while (cursor.moveToNext()) {
-                val rollQuery =
-                    "SELECT rollNo FROM ${Utils().TABLE_STUDENT_DETAIL} WHERE degree = '${cursor.getString(0)}' AND " +
-                            "class = '${cursor.getString(1)}' AND " +
-                            "year = '${cursor.getString(2)}' AND " +
-                            "mode = 'R'"
-                val lateralQuery =
-                    "SELECT rollNo FROM ${Utils().TABLE_STUDENT_DETAIL} WHERE degree = '${cursor.getString(0)}' AND " +
-                            "class = '${cursor.getString(1)}' AND " +
-                            "year = '${cursor.getString(2)}' AND " +
-                            "mode = 'LE'"
+                val tableName = cursor.getString(0) + "_" + cursor.getString(1) + "_" + cursor.getString(2)
+                val rollQuery = "SELECT rollNo FROM $tableName WHERE mode = 'R'"
+                val lateralQuery = "SELECT rollNo FROM $tableName WHERE mode = 'LE'"
 
                 val rollCursor =db.rawQuery(rollQuery, null)
                 val lateralCursor = db.rawQuery(lateralQuery, null)
-                println("Check 1")
                 if (rollCursor.moveToFirst()){
-                    println(rollCursor.getString(0))
                     rollNumbers.add(rollCursor.getString(0).toString().substring(0,7))
                 }
                 if(lateralCursor.moveToFirst()) {

@@ -12,9 +12,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -40,7 +43,7 @@ public class AddClass extends AppCompatActivity {
     TextInputLayout className;
     String[] semester, degree;
     AlertDialog alert;
-    private String degreeText, yearText,extension;
+    private String degreeText, yearText, extension;
     Uri fileName;
 
     @Override
@@ -65,28 +68,29 @@ public class AddClass extends AppCompatActivity {
 
         dbhelper = new DbHelper(this);
 
+//      TODO : ATTACH A INPUT FIELD TO GET THE DURATION OF CLASS
+
         ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, degree);
         ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, semester);
-
         yearName.setAdapter(semesterAdapter);
         degreeName.setAdapter(degreeAdapter);
 
         yearName.setOnItemClickListener((adapterView, view, i, l) -> yearText = yearName.getText().toString());
-
         degreeName.setOnItemClickListener((adapterView, view, i, l) -> degreeText = degreeName.getText().toString());
 
         alert = alertDialogBox.displayDialog(utils.getADD_CLASS_MESSAGE());
         alert.show();
 
         excel.setOnClickListener(v -> {
-            System.out.println(yearText);
-            System.out.println(degreeText);
-
-            if (ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 selectFile();
             } else {
-                ActivityCompat.requestPermissions(AddClass.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                if (ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(AddClass.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    selectFile();
+                } else {
+                    ActivityCompat.requestPermissions(AddClass.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                }
             }
         });
 
@@ -98,14 +102,15 @@ public class AddClass extends AppCompatActivity {
 
             String classText = String.valueOf(className.getEditText().getText());
             boolean valid = validate(degreeText, classText, yearText);
-            if(valid){
+            String tableName = degreeText + "_" + classText + "_" + yearText;
+            if (valid) {
                 extension = fileNameText.getText().toString().split("\\.")[1];
-            } else{
+            } else {
                 Toast.makeText(AddClass.this, "Select the Excel File", Toast.LENGTH_SHORT).show();
             }
-
+            createTable(tableName);
             ProcessExcel processExcel = new ProcessExcel(AddClass.this);
-            boolean validateFile = processExcel.validateFile(fileName, extension,degreeText,classText,yearText);
+            boolean validateFile = processExcel.validateFile(fileName, tableName, extension, degreeText, classText, yearText);
 
             if (validateFile) {
                 classData.addClass(degreeText, classText, yearText);
@@ -116,6 +121,7 @@ public class AddClass extends AppCompatActivity {
                 Toast.makeText(AddClass.this, "Check with File Format", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private boolean validate(String degreeText, String classText, String yearText) {
@@ -158,14 +164,25 @@ public class AddClass extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 102) {
             if (resultCode == RESULT_OK) {
-                String filepath = data.getData().getPath();
-                fileName = data.getData();
+                if (data != null) {
+                    fileName = data.getData();
+                }
                 Cursor fileCursor = getContentResolver().query(fileName, null, null, null, null);
                 int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                 fileCursor.moveToFirst();
                 fileNameText.setText(fileCursor.getString(nameIndex));
+                fileCursor.close();
             }
         }
+    }
+
+    private void createTable(String tableName) {
+        SQLiteDatabase db = openOrCreateDatabase(new Utils().getDB_NAME(), MODE_PRIVATE, null);
+        String createTable = "CREATE TABLE IF NOT EXISTS " + tableName + "(rollNo TEXT PRIMARY KEY,name TEXT,degree TEXT,class TEXT,year TEXT,phoneNumber TEXT,mode TEXT)";
+        System.out.println(createTable);
+        db.execSQL(createTable);
+        Log.d("Message", "Done");
+        db.close();
     }
 }
 

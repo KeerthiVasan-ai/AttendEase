@@ -41,7 +41,7 @@ public class ProcessExcel {
     }
 
 
-    public long readXLSXFile(final Uri file, String degreeText, String classText, String yearText) {
+    public long readXLSXFile(final Uri file,final String tableName, String degreeText, String classText, String yearText) {
         final long[] result = {0};
 
         AsyncTask.execute(() -> {
@@ -78,10 +78,10 @@ public class ProcessExcel {
                                 contentValue.put("year", yearText);
                                 contentValue.put("phoneNumber", C);
                                 contentValue.put("mode", D);
-                                db.insert(utils.getTABLE_STUDENT_DETAIL(), null, contentValue);
-                                ContentValues contentValue2 = new ContentValues();
-                                contentValue2.put("rollNo", A);
-                                result[0] = db.insert(utils.getTABLE_ATTENDANCE_DETAIL(), null, contentValue2);
+                                db.insert(tableName, null, contentValue);
+//                                ContentValues contentValue2 = new ContentValues();
+//                                contentValue2.put("rollNo", A);
+//                                result[0] = db.insert(utils.getTABLE_ATTENDANCE_DETAIL(), null, contentValue2);
                             } catch (SQLiteException ex) {
                                 ex.printStackTrace();
                             }
@@ -97,7 +97,7 @@ public class ProcessExcel {
     }
 
 
-    private long readXLSFile(final Uri file, String degreeText, String classText, String yearText) {
+    private long readXLSFile(final Uri file,final String tableName, String degreeText, String classText, String yearText) {
         final long[] result = {0};
         AsyncTask.execute(() -> {
             try {
@@ -132,10 +132,7 @@ public class ProcessExcel {
                                 contentValue.put("year", yearText);
                                 contentValue.put("mode",D);
                                 contentValue.put("phoneNumber", C);
-                                db.insert(utils.getTABLE_STUDENT_DETAIL(), null, contentValue);
-                                ContentValues contentValue2 = new ContentValues();
-                                contentValue2.put("rollNo", A);
-                                result[0] = db.insert(utils.getTABLE_ATTENDANCE_DETAIL(), null, contentValue2);
+                                db.insert(tableName, null, contentValue);
                             } catch (SQLiteException ex) {
                                 ex.printStackTrace();
                             }
@@ -169,6 +166,7 @@ public class ProcessExcel {
 
     public boolean validateFile(
             Uri fileName,
+            String tableName,
             String extension,
             String degreeText,
             String classText,
@@ -176,10 +174,10 @@ public class ProcessExcel {
         System.out.println(extension);
         if (fileName != null) {
             if (Objects.equals(extension, "xlsx")) {
-                Long done = readXLSXFile(fileName, degreeText, classText, yearText);
+                Long done = readXLSXFile(fileName,tableName, degreeText, classText, yearText);
                 return true;
             } else if (Objects.equals(extension, "xls")) {
-                Long done = readXLSFile(fileName, degreeText, classText, yearText);
+                Long done = readXLSFile(fileName,tableName, degreeText, classText, yearText);
                 return true;
             }
 
