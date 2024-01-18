@@ -111,8 +111,9 @@ class StudentDetail : AppCompatActivity() {
                     }
                     println(absentNumber)
                     Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG).show()
+                    startActivity(Intent(this, MainActivity::class.java))
+
                 } else {
-//                    TODO CREATE A ALERT MESSAGE
                     displayDialog(db,Utils().ATTENDANCE_UPDATE_WARNING)
                 }
             }
