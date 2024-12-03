@@ -9,13 +9,13 @@ open class DbHelper(context: Context) : SQLiteOpenHelper(context, Utils().DB_NAM
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL("CREATE TABLE ${Utils().TABLE_CLASS_DETAIL}("+
-                "degree TEXT,class TEXT,year TEXT)")
+                "degree TEXT,class TEXT,year TEXT,class_type TEXT)")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
     fun fetchAttendanceDetails(tableName: String): String {
-        val columnsToExclude = arrayOf("name", "degree", "class", "year", "phoneNumber", "mode")
+        val columnsToExclude = arrayOf("degree", "class", "year", "mode")
         return "SELECT ${buildIncludedColumns(columnsToExclude, tableName)} FROM $tableName"
     }
 

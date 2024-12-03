@@ -31,13 +31,13 @@ class StudentDetail : AppCompatActivity() {
     private lateinit var studentDetailAdapter: StudentDetailAdapter
     private lateinit var absentButton: Button
     private lateinit var switchMaterial: SwitchMaterial
-    private lateinit var tableName : String
-    private var attendanceInitialMode: String = Utils().ATTENDANCE_INITAL_STATUS   //1
-    private var attendanceUpdatedMode: String = Utils().ATTENDANCE_UPDATED_STATUS  //0
+    private lateinit var tableName: String
+    private var attendanceInitialMode: String = Utils().ATTENDANCE_PRESENT   //1
+    private var attendanceUpdatedMode: String = Utils().ATTENDANCE_ABSENT  //0
     private lateinit var absentNumber: ArrayList<String>
     private lateinit var builder: AlertDialog.Builder
     private lateinit var v: View
-    private lateinit var dialog : AlertDialog
+    private lateinit var dialog: AlertDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +49,7 @@ class StudentDetail : AppCompatActivity() {
         supportActionBar!!.title = "Student Details"
 
         builder = AlertDialog.Builder(this)
-        v = LayoutInflater.from(this).inflate(R.layout.fragement_alertbox,null)
+        v = LayoutInflater.from(this).inflate(R.layout.fragement_alertbox, null)
         dbHelper = DbHelper(this)
         val studentData = StudentData(this)
         val utils = Utils()
@@ -85,7 +85,7 @@ class StudentDetail : AppCompatActivity() {
 
                 sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
                 val lastRunTime: Long = sharedPreferences.getLong("LastRunTime", -1)
-                val lastTableName: String = sharedPreferences.getString("LastTableName","class")!!
+                val lastTableName: String = sharedPreferences.getString("LastTableName", "class")!!
 
                 val isInitiated = logic.attendanceLogic(
                     sharedPreferences,
@@ -93,7 +93,8 @@ class StudentDetail : AppCompatActivity() {
                     lastTableName,
                     tableName,
                     attendanceInitialMode,
-                    utils.COLUMN_NAME
+                    utils.COLUMN_NAME,
+                    true
                 )
                 absentNumber = studentDetailAdapter.attendedRoll
                 println(absentNumber)
@@ -110,11 +111,14 @@ class StudentDetail : AppCompatActivity() {
                         )
                     }
                     println(absentNumber)
-                    Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG).show()
-                    startActivity(Intent(this, MainActivity::class.java))
+                    Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
+                        .show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
 
                 } else {
-                    displayDialog(db,Utils().ATTENDANCE_UPDATE_WARNING)
+                    displayDialog(db, Utils().ATTENDANCE_UPDATE_WARNING)
                 }
             }
         } else {
@@ -131,18 +135,18 @@ class StudentDetail : AppCompatActivity() {
 
         switchMaterial.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                attendanceInitialMode = Utils().ATTENDANCE_UPDATED_STATUS
-                attendanceUpdatedMode = Utils().ATTENDANCE_INITAL_STATUS
-                Toast.makeText(this, "You are going to select Present Students ", Toast.LENGTH_LONG)
+                attendanceInitialMode = Utils().ATTENDANCE_ABSENT
+                attendanceUpdatedMode = Utils().ATTENDANCE_PRESENT
+                Toast.makeText(this, "You are going to select Present Students", Toast.LENGTH_LONG)
                     .show()
             }
         }
         return true
     }
 
-    private fun displayDialog(db:SQLiteDatabase,message:String){
+    private fun displayDialog(db: SQLiteDatabase, message: String) {
 
-        val displayView : TextView = v.findViewById(R.id.alertbox)
+        val displayView: TextView = v.findViewById(R.id.alertbox)
         displayView.text = message
         builder.setView(v)
         builder.setTitle("WARNING")
@@ -161,11 +165,15 @@ class StudentDetail : AppCompatActivity() {
                 }
                 println(absentNumber)
                 Toast.makeText(this, "Attendance Updated", Toast.LENGTH_LONG).show()
-                startActivity(Intent(this, MainActivity::class.java))
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
 
             }.setNegativeButton("Cancel") { _, _ ->
                 dialog.dismiss()
-                startActivity(Intent(this, MainActivity::class.java))
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
             }
         dialog = builder.create()
         dialog.setCanceledOnTouchOutside(false)

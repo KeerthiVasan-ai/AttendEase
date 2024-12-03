@@ -23,9 +23,9 @@ import java.util.ArrayList;
 public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHolder> {
 
     Context context;
-    ArrayList<String> degreeName,className,yearName;
+    ArrayList<String> degreeName, className, yearName;
 
-    public ManageClassAdapter(Context context,ArrayList<String> degreeName,ArrayList<String> className,ArrayList<String> yearName) {
+    public ManageClassAdapter(Context context, ArrayList<String> degreeName, ArrayList<String> className, ArrayList<String> yearName) {
 
         this.context = context;
         this.degreeName = degreeName;
@@ -36,7 +36,7 @@ public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHold
     @NonNull
     @Override
     public ManageClassViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.class_layout,parent,false);
+        View v = LayoutInflater.from(context).inflate(R.layout.class_layout, parent, false);
         return new ManageClassViewHolder(v);
     }
 
@@ -44,7 +44,7 @@ public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHold
     public void onBindViewHolder(@NonNull ManageClassViewHolder holder, int position) {
         holder.outDegreeName.setText(String.valueOf(degreeName.get(position)));
         holder.outClassName.setText(String.valueOf(className.get(position)));
-        holder.outYearName.setText("Semester:"+String.valueOf(yearName.get(position)));
+        holder.outYearName.setText("Semester:" + String.valueOf(yearName.get(position)));
     }
 
     @Override
@@ -53,9 +53,9 @@ public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHold
     }
 }
 
-class ManageClassViewHolder extends RecyclerView.ViewHolder{
+class ManageClassViewHolder extends RecyclerView.ViewHolder {
 
-    TextView outDegreeName,outClassName,outYearName;
+    TextView outDegreeName, outClassName, outYearName;
     Utils utils = new Utils();
     ImageButton delete;
 
@@ -82,16 +82,19 @@ class ManageClassViewHolder extends RecyclerView.ViewHolder{
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
             String whereClause = "degree = ? AND class = ? AND year = ?";
-            String[] whereArgs = {outDegreeText,outClassText,outYearText};
+            String[] whereArgs = {outDegreeText, outClassText, outYearText};
 
             String query = "DROP TABLE " + tableName;
             System.out.println(query);
             db.execSQL(query);
-            db.delete(utils.getTABLE_CLASS_DETAIL(),whereClause,whereArgs);
+            db.delete(utils.getTABLE_CLASS_DETAIL(), whereClause, whereArgs);
             db.close();
 
             Toast.makeText(itemView.getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
-            itemView.getContext().startActivity(new Intent(itemView.getContext(), MainActivity.class));
+
+            Intent intent = new Intent(itemView.getContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            itemView.getContext().startActivity(intent);
 
         });
     }

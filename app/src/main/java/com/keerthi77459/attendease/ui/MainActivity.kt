@@ -64,14 +64,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.addClass -> {
                 startActivity(Intent(this, AddClass::class.java))
             }
+
             R.id.manageClass -> {
                 startActivity(Intent(this, ManageClass::class.java))
             }
+
             R.id.quickAttendance -> {
                 startActivity(Intent(this, QuickAttendance::class.java))
             }
+
             R.id.generateReport -> {
                 startActivity(Intent(this, GenerateReport::class.java))
+            }
+
+            R.id.modifyAttendance -> {
+                startActivity(Intent(this, ModifyAttendance::class.java))
+            }
+
+            R.id.viewAttendance -> {
+                startActivity(Intent(this, ViewAttendance::class.java))
             }
         }
         return true
