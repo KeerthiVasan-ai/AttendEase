@@ -6,10 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.view.View;
+import android.util.Log;
 
 import com.keerthi77459.attendease.db.DbHelper;
-import com.keerthi77459.attendease.utils.Utils;
 
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -29,7 +28,6 @@ public class ProcessExcel {
 
     Context context;
     DbHelper dbHelper;
-    Utils utils = new Utils();
 
     public ProcessExcel(Context context) {
         this.context = context;
@@ -41,7 +39,7 @@ public class ProcessExcel {
     }
 
 
-    public long readXLSXFile(final Uri file,final String tableName, String degreeText, String classText, String yearText) {
+    public long readXLSXFile(final Uri file, final String tableName, String degreeText, String classText, String yearText) {
         final long[] result = {0};
 
         AsyncTask.execute(() -> {
@@ -57,27 +55,27 @@ public class ProcessExcel {
                     for (int r = 1; r < rowsCount; r++) {
                         Row row = sheet.getRow(r);
                         if (row.getPhysicalNumberOfCells() == 4) {
-                            String A = getCellData(row, 0, formulaEvaluator);
-                            String B = getCellData(row, 1, formulaEvaluator);
-                            String C = getCellData(row, 2, formulaEvaluator);
-                            String D = getCellData(row, 3, formulaEvaluator);
+                            String rollNo = getCellData(row, 0, formulaEvaluator);
+                            String name = getCellData(row, 1, formulaEvaluator);
+//                            String phoneNumber = getCellData(row, 2, formulaEvaluator);
+                            String mode = getCellData(row, 2, formulaEvaluator);
 
-                            System.out.println(A);
-                            System.out.println(B);
-                            System.out.println(C);
-                            System.out.println(D);
+                            System.out.println(rollNo);
+                            System.out.println(name);
+//                            System.out.println(phoneNumber);
+                            System.out.println(mode);
 
 
                             try {
                                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                                 ContentValues contentValue = new ContentValues();
-                                contentValue.put("rollNo", A);
-                                contentValue.put("name", B);
+                                contentValue.put("rollNo", rollNo);
+                                contentValue.put("name", name);
                                 contentValue.put("degree", degreeText);
                                 contentValue.put("class", classText);
                                 contentValue.put("year", yearText);
-                                contentValue.put("phoneNumber", C);
-                                contentValue.put("mode", D);
+//                                contentValue.put("phoneNumber", phoneNumber);
+                                contentValue.put("mode", mode);
                                 db.insert(tableName, null, contentValue);
 //                                ContentValues contentValue2 = new ContentValues();
 //                                contentValue2.put("rollNo", A);
@@ -97,7 +95,7 @@ public class ProcessExcel {
     }
 
 
-    private long readXLSFile(final Uri file,final String tableName, String degreeText, String classText, String yearText) {
+    private long readXLSFile(final Uri file, final String tableName, String degreeText, String classText, String yearText) {
         final long[] result = {0};
         AsyncTask.execute(() -> {
             try {
@@ -112,26 +110,26 @@ public class ProcessExcel {
                     for (int r = 1; r < rowsCount; r++) {
                         HSSFRow row = sheet.getRow(r);
                         if (row.getPhysicalNumberOfCells() == 4) {
-                            String A = getCellData(row, 0, formulaEvaluator);
-                            String B = getCellData(row, 1, formulaEvaluator);
-                            String C = getCellData(row, 2, formulaEvaluator);
-                            String D = getCellData(row, 3, formulaEvaluator);
+                            String rollNo = getCellData(row, 0, formulaEvaluator);
+                            String name = getCellData(row, 1, formulaEvaluator);
+//                            String phoneNumber = getCellData(row, 2, formulaEvaluator);
+                            String mode = getCellData(row, 2, formulaEvaluator);
 
-                            System.out.println(A);
-                            System.out.println(B);
-                            System.out.println(C);
-                            System.out.println(D);
+                            System.out.println(rollNo);
+                            System.out.println(name);
+//                            System.out.println(phoneNumber);
+                            System.out.println(mode);
 
                             try {
                                 SQLiteDatabase db = dbHelper.getWritableDatabase();
                                 ContentValues contentValue = new ContentValues();
-                                contentValue.put("rollNo", A);
-                                contentValue.put("name", B);
+                                contentValue.put("rollNo", rollNo);
+                                contentValue.put("name", name);
                                 contentValue.put("degree", degreeText);
                                 contentValue.put("class", classText);
                                 contentValue.put("year", yearText);
-                                contentValue.put("mode",D);
-                                contentValue.put("phoneNumber", C);
+                                contentValue.put("mode", mode);
+//                                contentValue.put("phoneNumber", phoneNumber);
                                 db.insert(tableName, null, contentValue);
                             } catch (SQLiteException ex) {
                                 ex.printStackTrace();
@@ -174,10 +172,12 @@ public class ProcessExcel {
         System.out.println(extension);
         if (fileName != null) {
             if (Objects.equals(extension, "xlsx")) {
-                Long done = readXLSXFile(fileName,tableName, degreeText, classText, yearText);
+                long done = readXLSXFile(fileName, tableName, degreeText, classText, yearText);
+                Log.d("From Process Excel => Type : XLSX", String.valueOf(done));
                 return true;
             } else if (Objects.equals(extension, "xls")) {
-                Long done = readXLSFile(fileName,tableName, degreeText, classText, yearText);
+                long done = readXLSFile(fileName, tableName, degreeText, classText, yearText);
+                Log.d("From Process Excel => Type : XLSX", String.valueOf(done));
                 return true;
             }
 
