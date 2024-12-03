@@ -31,7 +31,7 @@
             android:textSize="18sp"
             android:textColor="@color/black"
             android:fontFamily="@font/poppinsbold"
-            android:text="Generate Attendance Report"
+            android:text="@string/generate_attendance_report"
             app:layout_constraintTop_toTopOf="@id/innerLayout"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -52,49 +52,49 @@
                 android:fontFamily="@font/ebgaramondmedium"
                 android:layout_weight="1"
                 android:inputType="none"
-                android:hint="Chose Degree"/>
+                android:hint="@string/choose_class"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inpClassNameField"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField"
-            >
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            android:id="@+id/inpClassNameField"-->
+<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField"-->
+<!--            >-->
 
-            <AutoCompleteTextView
-                android:id="@+id/inpClassName"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="@font/ebgaramondmedium"
-                android:inputType="none"
-                android:hint="Chose Class"/>
+<!--            <AutoCompleteTextView-->
+<!--                android:id="@+id/inpClassName"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1"-->
+<!--                android:fontFamily="@font/ebgaramondmedium"-->
+<!--                android:inputType="none"-->
+<!--                android:hint="Chose Class"/>-->
 
-        </com.google.android.material.textfield.TextInputLayout>
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inpYearNameField"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/inpClassNameField"
-            >
+<!--        <com.google.android.material.textfield.TextInputLayout-->
+<!--            android:id="@+id/inpYearNameField"-->
+<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/inpClassNameField"-->
+<!--            >-->
 
-            <AutoCompleteTextView
-                android:id="@+id/inpYearName"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:fontFamily="@font/ebgaramondmedium"
-                android:inputType="none"
-                android:hint="Chose Semester"/>
+<!--            <AutoCompleteTextView-->
+<!--                android:id="@+id/inpYearName"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1"-->
+<!--                android:fontFamily="@font/ebgaramondmedium"-->
+<!--                android:inputType="none"-->
+<!--                android:hint="Chose Semester"/>-->
 
-        </com.google.android.material.textfield.TextInputLayout>
+<!--        </com.google.android.material.textfield.TextInputLayout>-->
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/downloadReport"
@@ -104,7 +104,7 @@
             app:cornerRadius="4dp"
             android:fontFamily="@font/ebgaramondsemibold"
             android:text="Generate Report"
-            app:layout_constraintTop_toBottomOf="@id/inpYearNameField"/>
+            app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -112,21 +112,3 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <!--        <com.google.android.material.textfield.TextInputLayout-->
-    <!--            android:id="@+id/inpClassNameField"-->
-    <!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-    <!--            android:layout_marginTop="16dp"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:hint="Class"-->
-    <!--            app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField">-->
-
-    <!--            <com.google.android.material.textfield.TextInputEditText-->
-    <!--                android:fontFamily="@font/ebgaramondmedium"-->
-    <!--                android:id="@+id/inpClassName"-->
-    <!--                android:layout_width="match_parent"-->
-    <!--                android:layout_height="wrap_content"/>-->
-
-    <!--        </com.google.android.material.textfield.TextInputLayout>-->

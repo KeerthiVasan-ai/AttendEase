@@ -1,21 +1,17 @@
 package com.keerthi77459.attendease.ui;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.keerthi77459.attendease.R;
 import com.keerthi77459.attendease.db.DbHelper;
@@ -31,15 +27,17 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GenerateReport extends AppCompatActivity {
 
     Button downloadReport;
-    AutoCompleteTextView inpDegreeName, inpClassName, inpYearName;
+    AutoCompleteTextView inpDegreeName;
     private String inpDegreeText, inpClassText, inpYearText;
     DbHelper dbHelper;
     Utils utils;
+    ArrayList<String> overallClassDetails;
     ClassData classData;
 
     @Override
@@ -51,47 +49,46 @@ public class GenerateReport extends AppCompatActivity {
         classData = new ClassData(this);
         utils = new Utils();
 
-        classData.getClass();
+        overallClassDetails = classData.mergedClassDetails();
 
         inpDegreeName = findViewById(R.id.inpDegreeName);
-        inpClassName = findViewById(R.id.inpClassName);
-        inpYearName = findViewById(R.id.inpYearName);
         downloadReport = findViewById(R.id.downloadReport);
 
-        ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.degreeName);
-        ArrayAdapter<String> classAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.className);
-        ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classData.yearName);
-        inpYearName.setAdapter(semesterAdapter);
-        inpClassName.setAdapter(classAdapter);
+        ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, overallClassDetails);
+
         inpDegreeName.setAdapter(degreeAdapter);
 
-        inpYearName.setOnItemClickListener((adapterView, view, i, l) -> inpYearText = inpYearName.getText().toString());
-        inpClassName.setOnItemClickListener((adapterView, view, i, l) -> inpClassText = inpClassName.getText().toString());
-        inpDegreeName.setOnItemClickListener((adapterView, view, i, l) -> inpDegreeText = inpDegreeName.getText().toString());
+
+        inpDegreeName.setOnItemClickListener((adapterView, view, i, l) -> {
+            inpDegreeText = inpDegreeName.getText().toString().split("-")[0];
+            inpYearText = inpDegreeName.getText().toString().split("-")[2];
+            inpClassText = inpDegreeName.getText().toString().split("-")[1];
+        });
 
         downloadReport.setOnClickListener(view -> {
             inpDegreeName.setError(null);
-            inpClassName.setError(null);
-            inpYearName.setError(null);
-            boolean valid = validate(inpDegreeText, inpClassText, inpYearText);
+
+            boolean valid = validate(inpDegreeText);
             if (valid) {
-                getAllLocalUser(inpDegreeText, inpClassText, inpYearText);
+                getAttendanceFromDB(inpDegreeText, inpClassText, inpYearText);
             }
         });
     }
 
-    public void getAllLocalUser(String inpDegreeName, String inpClassName, String inpYearName) {
+    public void getAttendanceFromDB(String inpDegreeName, String inpClassName, String inpYearName) {
 
         makeDir();
         SQLiteDatabase database = dbHelper.getReadableDatabase();
         Workbook workbook = new HSSFWorkbook();
-        String tableName = inpDegreeName + "_" + inpClassName + "_" + inpYearName;
 
+// -------------------------------------------------------------------------------------------------
+
+        String tableName = inpDegreeName + "_" + inpClassName + "_" + inpYearName;
 
         Sheet daySheet = workbook.createSheet("DayWiseDetails");
         String query = dbHelper.fetchAttendanceDetails(tableName);
 
-        Log.d("DailyWiseQuery",query);
+        Log.d("DailyWiseQuery", query);
         Cursor cursor = database.rawQuery(query, null);
         String[] columnNames = cursor.getColumnNames();
 
@@ -113,53 +110,59 @@ public class GenerateReport extends AppCompatActivity {
 
         cursor.close();
 
+//--------------------------------------------------------------------------------------------------
+
 //        TODO : CHANGE THE WORK IN ACADEMIC BASIS
 
         Sheet monthSheet = workbook.createSheet("MonthWiseDetails");
 
         String[] resourceMonths = getResources().getStringArray(R.array.month);
         String[] months = Arrays.copyOfRange(resourceMonths, 0, utils.getCURRENT_MONTH());
-        System.out.println(months.length);
         String[] monthNames = getResources().getStringArray(R.array.monthName);
-        StringBuilder queryBuilder = new StringBuilder("SELECT rollNo,");
+        StringBuilder monthAttendanceQuery = new StringBuilder("SELECT rollNo,");
 
         for (String month : months) {
-            queryBuilder.append("SUM(");
-            String testQuery = "SELECT name FROM pragma_table_info('" + tableName + "') WHERE name LIKE '_%_" + month + "_%_%_%'";
-            Cursor cursor1 = database.rawQuery(testQuery, null);
-            if (cursor1.moveToFirst()) {
+            monthAttendanceQuery.append("SUM(");
+            String testQuery = "SELECT name FROM pragma_table_info('" + tableName + "') WHERE name LIKE '____" + month + "_%'";
+
+            System.out.println(testQuery);
+
+            Cursor columnSelectionQuery = database.rawQuery(testQuery, null);
+            if (columnSelectionQuery.moveToFirst()) {
                 do {
-                    String columnName = cursor1.getString(0);
+                    String columnName = columnSelectionQuery.getString(0);
+
                     System.out.println(columnName);
-                    queryBuilder.append("COALESCE(").append(columnName).append(",0) + ");
-                } while (cursor1.moveToNext());
+
+                    monthAttendanceQuery.append("COALESCE(").append(columnName).append(",0) + ");
+                } while (columnSelectionQuery.moveToNext());
             } else {
-                queryBuilder.append("0 + ");
+                monthAttendanceQuery.append("0 + ");
             }
-            queryBuilder.setLength(queryBuilder.length() - 3);
-            queryBuilder.append(") AS ").append(monthNames[Integer.parseInt(month) - 1]).append(", ");
-            cursor1.close();
+            monthAttendanceQuery.setLength(monthAttendanceQuery.length() - 3);
+            monthAttendanceQuery.append(") AS ").append(monthNames[Integer.parseInt(month) - 1]).append(", ");
+            columnSelectionQuery.close();
         }
-        queryBuilder.setLength(queryBuilder.length() - 2);
-        queryBuilder.append(" FROM ").append(tableName).append(" GROUP BY rollNo");
+        monthAttendanceQuery.setLength(monthAttendanceQuery.length() - 2);
+        monthAttendanceQuery.append(" FROM ").append(tableName).append(" GROUP BY rollNo");
 
-        String query1 = queryBuilder.toString();
-        Log.d("MonthWiseQuery",query1);
+        String monthWiseAttendanceQuery = monthAttendanceQuery.toString();
 
-        Cursor resultCursor = database.rawQuery(query1, null);
+        Log.d("Month Wise Query", monthWiseAttendanceQuery);
 
-        String[] columnNames1 = resultCursor.getColumnNames();
+        Cursor resultCursor = database.rawQuery(monthWiseAttendanceQuery, null);
+        String[] monthColumnNames = resultCursor.getColumnNames();
 
         Row headerRow1 = monthSheet.createRow(0);
-        for (int i = 0; i < columnNames1.length; i++) {
+        for (int i = 0; i < monthColumnNames.length; i++) {
             Cell cell = headerRow1.createCell(i);
-            cell.setCellValue(columnNames1[i]);
+            cell.setCellValue(monthColumnNames[i]);
         }
 
         int rowIndex1 = 1;
         while (resultCursor.moveToNext()) {
             Row row1 = monthSheet.createRow(rowIndex1);
-            for (int i = 0; i < columnNames1.length; i++) {
+            for (int i = 0; i < monthColumnNames.length; i++) {
                 Cell cell = row1.createCell(i);
                 cell.setCellValue(resultCursor.getString(i));
             }
@@ -176,7 +179,7 @@ public class GenerateReport extends AppCompatActivity {
         File output;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // 12,13
+            // 12,13,14
             String downloadDir = Environment.getExternalStorageDirectory().getPath();
             output = new File(downloadDir + "/Download/AttendEase", fileName);
         } else {
@@ -213,18 +216,9 @@ public class GenerateReport extends AppCompatActivity {
         }
     }
 
-    private boolean validate(String degreeText, String classText, String yearText) {
+    private boolean validate(String degreeText) {
         if (degreeText == null) {
             inpDegreeName.setError("Select a Degree");
-            return false;
-        }
-        if (classText.trim().isEmpty()) {
-            inpClassName.setError("Enter the Class Name");
-            return false;
-        }
-
-        if (yearText == null) {
-            inpYearName.setError("Select a Semester");
             return false;
         }
         return true;
