@@ -3,9 +3,6 @@ package com.keerthi77459.attendease.viewmodel
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteDatabase.openOrCreateDatabase
-import android.util.Log
 import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.utils.Utils
 
@@ -17,10 +14,11 @@ class Logic(context: Context) {
                         lastRunTime: Long,
                         lastTableName: String,
                         tableName: String,
-                        attendanceState:String,
-                        columnName : String):Int
+                        initialAttendanceState:String,
+                        columnName : String,
+                        isModify : Boolean):Int
     {
-        if(((Utils().CURRENT_TIME - lastRunTime) > utils.COMPARISON_CONSTANT) || (lastTableName != tableName)){
+        if(((utils.CURRENT_TIME - lastRunTime) > utils.COMPARISON_CONSTANT) || (lastTableName != tableName)){
 
             val db = dbHelper.writableDatabase
 
@@ -28,14 +26,16 @@ class Logic(context: Context) {
             db.execSQL(alterQuery)
 
             val contentValues = ContentValues()
-            contentValues.put(columnName,attendanceState)
+            contentValues.put(columnName,initialAttendanceState)
             db.update(tableName,contentValues,null,null)
 
-            val editor : SharedPreferences.Editor = sharedPreferences.edit()
-            editor.putLong("LastRunTime",utils.CURRENT_TIME)
-            editor.putString("LastTableName",tableName)
-            editor.putString("LatestColumn",columnName)
-            editor.apply()
+            if(isModify) {
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                editor.putLong("LastRunTime", utils.CURRENT_TIME)
+                editor.putString("LastTableName", tableName)
+                editor.putString("LatestColumn", columnName)
+                editor.apply()
+            }
 
             return 1
         } else {
