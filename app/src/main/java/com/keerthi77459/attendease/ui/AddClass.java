@@ -33,17 +33,19 @@ import com.keerthi77459.attendease.utils.Utils;
 import com.keerthi77459.attendease.viewmodel.AlertDialogBox;
 import com.keerthi77459.attendease.viewmodel.ProcessExcel;
 
+import java.util.Objects;
+
 public class AddClass extends AppCompatActivity {
 
     DbHelper dbhelper;
     Button submit;
     LinearLayout excel;
     TextView fileNameText;
-    AutoCompleteTextView degreeName, yearName;
+    AutoCompleteTextView degreeName, yearName, classTypeName;
     TextInputLayout className;
-    String[] semester, degree;
+    String[] semester, degree, classType;
     AlertDialog alert;
-    private String degreeText, yearText, extension;
+    private String degreeText, yearText, classTypeText, extension;
     Uri fileName;
 
     @Override
@@ -58,25 +60,29 @@ public class AddClass extends AppCompatActivity {
 
         semester = resource.getStringArray(R.array.semester);
         degree = resource.getStringArray(R.array.degree);
+        classType = resource.getStringArray(R.array.class_type);
 
         submit = findViewById(R.id.submit);
         excel = findViewById(R.id.uploadButton);
         className = findViewById(R.id.classNameField);
+        classTypeName = findViewById(R.id.classType);
         degreeName = findViewById(R.id.degreeName);
         yearName = findViewById(R.id.yearName);
         fileNameText = findViewById(R.id.fileNameText);
 
         dbhelper = new DbHelper(this);
 
-//      TODO : ATTACH A INPUT FIELD TO GET THE DURATION OF CLASS
-
         ArrayAdapter<String> degreeAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, degree);
         ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, semester);
+        ArrayAdapter<String> durationAdapter = new ArrayAdapter<>(this, R.layout.drop_down_text, classType);
+
         yearName.setAdapter(semesterAdapter);
         degreeName.setAdapter(degreeAdapter);
+        classTypeName.setAdapter(durationAdapter);
 
         yearName.setOnItemClickListener((adapterView, view, i, l) -> yearText = yearName.getText().toString());
         degreeName.setOnItemClickListener((adapterView, view, i, l) -> degreeText = degreeName.getText().toString());
+        classTypeName.setOnItemClickListener((adapterView, view, i, L) -> classTypeText = classTypeName.getText().toString());
 
         alert = alertDialogBox.displayDialog(utils.getADD_CLASS_MESSAGE());
         alert.show();
@@ -99,9 +105,14 @@ public class AddClass extends AppCompatActivity {
             degreeName.setError(null);
             className.setError(null);
             yearName.setError(null);
+            classTypeName.setError(null);
 
-            String classText = String.valueOf(className.getEditText().getText());
-            boolean valid = validate(degreeText, classText, yearText);
+//            String durationText = String.valueOf(duration.getEditText().getText());
+
+            String classText = String.valueOf(Objects.requireNonNull(className.getEditText()).getText());
+            System.out.println(classTypeText);
+
+            boolean valid = validate(degreeText, classText, yearText, classTypeText);
             String tableName = degreeText + "_" + classText + "_" + yearText;
             if (valid) {
                 extension = fileNameText.getText().toString().split("\\.")[1];
@@ -109,12 +120,15 @@ public class AddClass extends AppCompatActivity {
                 Toast.makeText(AddClass.this, "Select the Excel File", Toast.LENGTH_SHORT).show();
             }
             createTable(tableName);
-            ProcessExcel processExcel = new ProcessExcel(AddClass.this);
+
+            ProcessExcel processExcel = new ProcessExcel(this);
             boolean validateFile = processExcel.validateFile(fileName, tableName, extension, degreeText, classText, yearText);
 
             if (validateFile) {
-                classData.addClass(degreeText, classText, yearText);
-                startActivity(new Intent(AddClass.this, MainActivity.class));
+                classData.addClass(degreeText, classText, yearText, classTypeText);
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
                 finish();
                 Toast.makeText(AddClass.this, "Class Created Successfully", Toast.LENGTH_SHORT).show();
             } else {
@@ -124,7 +138,7 @@ public class AddClass extends AppCompatActivity {
 
     }
 
-    private boolean validate(String degreeText, String classText, String yearText) {
+    private boolean validate(String degreeText, String classText, String yearText, String timeDuration) {
         if (degreeText == null) {
             degreeName.setError("Select a Degree");
             return false;
@@ -136,6 +150,10 @@ public class AddClass extends AppCompatActivity {
 
         if (yearText == null) {
             yearName.setError("Select a Semester");
+            return false;
+        }
+        if (timeDuration == null) {
+            classTypeName.setError("Enter the Duration in Minutes");
             return false;
         }
         return true;
@@ -168,6 +186,7 @@ public class AddClass extends AppCompatActivity {
                     fileName = data.getData();
                 }
                 Cursor fileCursor = getContentResolver().query(fileName, null, null, null, null);
+                assert fileCursor != null;
                 int nameIndex = fileCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                 fileCursor.moveToFirst();
                 fileNameText.setText(fileCursor.getString(nameIndex));
@@ -178,7 +197,7 @@ public class AddClass extends AppCompatActivity {
 
     private void createTable(String tableName) {
         SQLiteDatabase db = openOrCreateDatabase(new Utils().getDB_NAME(), MODE_PRIVATE, null);
-        String createTable = "CREATE TABLE IF NOT EXISTS " + tableName + "(rollNo TEXT PRIMARY KEY,name TEXT,degree TEXT,class TEXT,year TEXT,phoneNumber TEXT,mode TEXT)";
+        String createTable = "CREATE TABLE IF NOT EXISTS " + tableName + "(rollNo TEXT PRIMARY KEY,name TEXT,degree TEXT,class TEXT,year TEXT,mode TEXT)";
         System.out.println(createTable);
         db.execSQL(createTable);
         Log.d("Message", "Done");
