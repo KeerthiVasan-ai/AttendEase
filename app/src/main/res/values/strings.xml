@@ -20,16 +20,26 @@
         <item>PhD</item>
     </string-array>
 
+    <string-array name="class_type">
+        <item>Theory</item>
+        <item>Lab</item>
+    </string-array>
+
+    <string-array name="attendance_type">
+        <item>Absent</item>
+        <item>Present</item>
+    </string-array>
+
     <string-array name="month">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
+        <item>07</item>
+        <item>08</item>
+        <item>09</item>
         <item>10</item>
         <item>11</item>
         <item>12</item>
@@ -49,9 +59,32 @@
         <item>"Nov"</item>
         <item>"Dec"</item>
     </string-array>
+
     <string name="title_activity_manage_class">ManageClass</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="choose_class">Choose Class</string>
+
+    <string name="generate_attendance_report">Generate Attendance Report</string>
+    <string name="modify_attendance">Modify Attendance</string>
+    <string name="quick_attendance">Quick Attendance</string>
+    <string name="view_attendance">View Attendance</string>
+
+    <string name="p">P</string>
+    <string name="a">A</string>
+
+    <string name="time">Select Time</string>
+    <string name="date">Select Date</string>
+
+    <string name="submit_attendance">Submit Attendance</string>
+    <string name="create_your_class">Create your Class</string>
+    <string name="get_attendance">Get Attendance</string>
+    <string name="chose_semester">Choose Semester</string>
+
+    <string name="class_type">Choose Class Type</string>
+    <string name="click_here_to_select_the_file">Click Here to Select the File</string>
+    <string name="choose_attendance_type">Choose Attendance Type</string>
+    <string name="attendance_details">Attendance Details</string>
 
 </resources>

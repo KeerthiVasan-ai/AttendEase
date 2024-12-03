@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/aText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/a"
+        android:padding="6dp"
+        android:fontFamily="@font/poppinsbold"
+        android:textColor="@color/black"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/toogleRoot"
@@ -12,12 +26,24 @@
         android:padding="6dp"
         android:scaleX="1.3"
         android:scaleY="1.3"
-        app:switchMinWidth="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/aText"
+        app:layout_constraintRight_toLeftOf="@+id/bText"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:layout_marginStart="12dp"
+        app:switchMinWidth="40dp" />
 
-
-
+    <TextView
+        android:id="@+id/bText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/poppinsbold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/toogleRoot"
+        android:textColor="@color/black"
+        android:text="@string/p"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

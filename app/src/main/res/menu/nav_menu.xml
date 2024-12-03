@@ -2,21 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/addClass"
-        android:title="Add Class"/>
+        android:title="Add Class" />
 
     <item
         android:id="@+id/manageClass"
-        android:title="Manage Class"/>
+        android:title="Manage Class" />
 
     <item
         android:id="@+id/quickAttendance"
-        android:title="Quick Attendance"/>
+        android:title="Quick Attendance" />
 
     <item
         android:id="@+id/generateReport"
-        android:title="Generate Report"/>
+        android:title="Generate Report" />
 
+    <item
+        android:id="@+id/modifyAttendance"
+        android:title="Modify Attendance" />
 
-
-
+    <item
+        android:id="@+id/viewAttendance"
+        android:title="View Attendance" />
 </menu>
