@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/background1"
+    android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.QuickAttendance">
@@ -29,7 +31,7 @@
                 android:textSize="18sp"
                 android:textColor="@color/black"
                 android:fontFamily="@font/poppinsbold"
-                android:text="Quick Attendance"
+                android:text="@string/quick_attendance"
                 app:layout_constraintTop_toTopOf="@id/innerLayout1"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -50,51 +52,28 @@
                     android:fontFamily="@font/ebgaramondmedium"
                     android:layout_weight="1"
                     android:inputType="none"
-                    android:hint="Chose Degree"/>
+                    android:hint="@string/choose_class"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/qaClassNameField"
+                android:id="@+id/qaAttendanceTypeField"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_marginTop="16dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/qaDegreeNameField"
-                >
+                app:layout_constraintTop_toBottomOf="@id/qaDegreeNameField">
 
                 <AutoCompleteTextView
-                    android:id="@+id/qaClassName"
+                    android:id="@+id/qaAttendanceTypeName"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:fontFamily="@font/ebgaramondmedium"
+                    android:layout_weight="1"
                     android:inputType="none"
-                    android:hint="Chose Class"/>
+                    android:hint="@string/choose_attendance_type"/>
 
             </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/qaYearNameField"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_marginTop="16dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/qaClassNameField"
-                >
-
-                <AutoCompleteTextView
-                    android:id="@+id/qaYearName"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/ebgaramondmedium"
-                    android:inputType="none"
-                    android:hint="Chose Semester"/>
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-<!--            DETAILS   -->
 
             <TextView
                 android:id="@+id/text3"
@@ -104,8 +83,8 @@
                 android:layout_marginTop="16dp"
                 android:textColor="@color/black"
                 android:fontFamily="@font/ebgaramondbold"
-                android:text="Absentees Details"
-                app:layout_constraintTop_toBottomOf="@id/qaYearNameField"
+                android:text="@string/attendance_details"
+                app:layout_constraintTop_toBottomOf="@id/qaAttendanceTypeField"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 />
@@ -151,7 +130,7 @@
                 android:layout_height="wrap_content"
                 app:cornerRadius="4dp"
                 android:fontFamily="@font/ebgaramondsemibold"
-                android:text="Submit Attendance"
+                android:text="@string/submit_attendance"
                 app:layout_constraintTop_toBottomOf="@id/lateralRollNoField"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
