@@ -50,9 +50,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         recycler1 = findViewById(R.id.recycle1)
         classAdapter = ClassAdapter(
             this,
-            classData.degreeName,
-            classData.className,
-            classData.yearName
+            classData.departmentName,
+            classData.mergedClassDetails(),
+            classData.classType,
+            classData.classStrength
         )
         recycler1.adapter = classAdapter
         recycler1.layoutManager = LinearLayoutManager(this)

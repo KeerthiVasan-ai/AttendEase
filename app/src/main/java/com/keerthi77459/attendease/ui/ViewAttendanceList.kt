@@ -15,6 +15,7 @@ class ViewAttendanceList : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_attendance_list)
 
+        val tableName = intent.getSerializableExtra("tableName")
         val attendanceType = intent.getSerializableExtra("attendanceType")
         val resultData =
             intent.getSerializableExtra("resultData") as? ArrayList<AttendanceData>
@@ -27,6 +28,9 @@ class ViewAttendanceList : AppCompatActivity() {
 
         val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = ViewAttendanceAdapter(this, resultData ?: ArrayList())
+        recyclerView.adapter =
+            ViewAttendanceAdapter(this, resultData ?: ArrayList(), tableName.toString())
+
+
     }
 }

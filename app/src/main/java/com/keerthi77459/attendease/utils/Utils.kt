@@ -49,11 +49,19 @@ open class Utils {
             "You can make a new attendance only after 45 minutes \n" +
             "CLICK OK TO PROCEED"
 
-    fun returnDate(date: String): String {
-        if (date.length == 1) {
-            return "0$date"
+    private fun returnDate(date: String): String {
+        if (date.length == 2) {
+            return date
         }
-        return date
+        return "0$date"
+    }
+
+    fun returnTimeHour(time: String): String {
+        return if (Integer.parseInt(time) < 8) {
+            (Integer.parseInt(time) + 12).toString()
+        } else {
+            time
+        }
     }
 
     fun getAttendanceStatus(resources: Resources, attendanceType: String): Pair<String?, String?> {

@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.keerthi77459.attendease.R
@@ -50,12 +52,9 @@ class ViewAttendance : AppCompatActivity() {
         val degreeAdapter: ArrayAdapter<String> =
             ArrayAdapter<String>(this, R.layout.drop_down_text, overallClassDetails)
 
-        val attendanceTypeAdapter: ArrayAdapter<String> =
-            ArrayAdapter<String>(
-                this,
-                R.layout.drop_down_text,
-                resources.getStringArray(R.array.attendance_type)
-            )
+        val attendanceTypeAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this, R.layout.drop_down_text, resources.getStringArray(R.array.attendance_type)
+        )
 
         vaDegreeName.setAdapter(degreeAdapter)
         vaAttendanceTypeName.setAdapter(attendanceTypeAdapter)
@@ -70,8 +69,13 @@ class ViewAttendance : AppCompatActivity() {
             vaAttendanceType = vaAttendanceTypeName.text.toString()
         }
 
-        val materialDateBuilder: MaterialDatePicker.Builder<*> =
+        val materialDateBuilder: MaterialDatePicker.Builder<Long> =
             MaterialDatePicker.Builder.datePicker().setTitleText("SELECT A DATE")
+                .setCalendarConstraints(
+                    CalendarConstraints.Builder()
+                        .setValidator(DateValidatorPointBackward.now()) // Restrict to past and current dates
+                        .build()
+                )
 
         val materialDatePicker = materialDateBuilder.build()
 
@@ -79,8 +83,10 @@ class ViewAttendance : AppCompatActivity() {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
         }
 
-        materialDatePicker.addOnPositiveButtonClickListener {
-            date.setText(materialDatePicker.headerText)
+        materialDatePicker.addOnPositiveButtonClickListener { selection ->
+            val sdf = java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault())
+            val formattedDate = sdf.format(selection)
+            date.setText(formattedDate)
         }
 
         viewAttendance.setOnClickListener {
@@ -92,16 +98,14 @@ class ViewAttendance : AppCompatActivity() {
             val dateValue = date.text.toString()
 
             val isValid = validate(
-                vaDegreeText,
-                date.text.toString(),
-                vaAttendanceType
+                vaDegreeText, date.text.toString(), vaAttendanceType
             )
             Log.d("VA Validation", isValid.toString())
 
             if (isValid) {
                 val db = dbHelper.writableDatabase
 
-                val date = utils.returnDate(dateValue.split(" ")[0])
+                val date = dateValue.split(" ")[0]
                 val month = MapDateAndTime().timeDate[dateValue.split(" ")[1]]
                 val year = dateValue.split(" ")[2]
 
@@ -116,12 +120,7 @@ class ViewAttendance : AppCompatActivity() {
                 println(tableName)
 
                 val viewAttendanceData = fetchAttendanceData.fetchTrueValues(
-                    db,
-                    tableName,
-                    date,
-                    month.toString(),
-                    year,
-                    attendanceStatus
+                    db, tableName, date, month.toString(), year, attendanceStatus
                 )
 
                 println(viewAttendanceData)
@@ -129,6 +128,7 @@ class ViewAttendance : AppCompatActivity() {
                 val resultData =
                     ArrayList(viewAttendanceData.map { AttendanceData(it.first, it.second) })
                 val intent = Intent(this, ViewAttendanceList::class.java)
+                intent.putExtra("tableName", tableName)
                 intent.putExtra("attendanceType", vaAttendanceType)
                 intent.putExtra("resultData", resultData)
                 startActivity(intent)

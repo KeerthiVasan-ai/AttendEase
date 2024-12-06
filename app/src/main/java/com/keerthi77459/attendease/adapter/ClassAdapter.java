@@ -1,5 +1,6 @@
 package com.keerthi77459.attendease.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,40 +21,42 @@ import java.util.ArrayList;
 public class ClassAdapter extends RecyclerView.Adapter<ClassViewHolder> {
 
     Context context;
-    ArrayList<String> degreeName,className,yearName;
+    ArrayList<String> departmentName, allClass, classType, classStrength;
 
-    public ClassAdapter(Context context,ArrayList<String> degreeName,ArrayList<String> className,ArrayList<String> yearName) {
+    public ClassAdapter(Context context, ArrayList<String> departmentName, ArrayList<String> allClass, ArrayList<String> classType, ArrayList<String> classStrength) {
 
         this.context = context;
-        this.degreeName = degreeName;
-        this.className = className;
-        this.yearName = yearName;
+        this.departmentName = departmentName;
+        this.allClass = allClass;
+        this.classType = classType;
+        this.classStrength = classStrength;
     }
 
     @NonNull
     @Override
     public ClassViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.class_layout,parent,false);
+        View v = LayoutInflater.from(context).inflate(R.layout.class_layout, parent, false);
         return new ClassViewHolder(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ClassViewHolder holder, int position) {
-        holder.outDegreeName.setText(String.valueOf(degreeName.get(position)));
-        holder.outClassName.setText(String.valueOf(className.get(position)));
-        holder.outYearName.setText("Semester:"+String.valueOf(yearName.get(position)));
+        holder.outDepartmentName.setText(String.valueOf(departmentName.get(position)));
+        holder.outClassName.setText(String.valueOf(allClass.get(position)));
+        holder.outClassStrength.setText("Class Strength:" + classStrength.get(position));
     }
 
     @Override
     public int getItemCount() {
 
-        return className.size();
+        return allClass.size();
     }
 }
 
-class ClassViewHolder extends RecyclerView.ViewHolder{
+class ClassViewHolder extends RecyclerView.ViewHolder {
 
-    TextView outDegreeName,outClassName,outYearName;
+    TextView outDepartmentName, outClassName, outClassStrength;
     ImageButton delete;
     SharedPreferences sharedPreferences;
 
@@ -61,26 +65,31 @@ class ClassViewHolder extends RecyclerView.ViewHolder{
         super(itemView);
 
         delete = itemView.findViewById(R.id.deleteClass);
-        outDegreeName = itemView.findViewById(R.id.outDegreeName);
+        outDepartmentName = itemView.findViewById(R.id.outDegreeName);
         outClassName = itemView.findViewById(R.id.outClassName);
-        outYearName = itemView.findViewById(R.id.outYearName);
+        outClassStrength = itemView.findViewById(R.id.outYearName);
 
         delete.setVisibility(View.INVISIBLE);
 
-        itemView.setOnClickListener(view -> {
-            sharedPreferences = itemView.getContext().getSharedPreferences("dataPassing",Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            String year = outYearName.getText().toString().split(":")[1];
-            editor.putString("outDegreeName",outDegreeName.getText().toString());
-            editor.putString("outClassName",outClassName.getText().toString());
-            editor.putString("outYearName",year);
+        System.out.println(outClassName.getText().toString());
 
-            editor.commit();
+        itemView.setOnClickListener(view -> {
+            sharedPreferences = itemView.getContext().getSharedPreferences("dataPassing", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            String degree = outClassName.getText().toString().split("-")[0];
+            String Class = outClassName.getText().toString().split("-")[1];
+            String year = outClassName.getText().toString().split("-")[2];
+            String classType = outClassName.getText().toString().split("-")[3];
+            String classStrength = outClassStrength.getText().toString().split(":")[1];
+
+            editor.putString("outDegreeName", degree);
+            editor.putString("outClassName", Class);
+            editor.putString("outYearName", year);
+            editor.putString("classStrength", classStrength);
+
+            editor.apply();
             Intent intent = new Intent(itemView.getContext(), StudentDetail.class);
             itemView.getContext().startActivity(intent);
         });
-
-
-
     }
 }

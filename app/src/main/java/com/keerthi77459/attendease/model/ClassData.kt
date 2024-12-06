@@ -9,17 +9,23 @@ import com.keerthi77459.attendease.utils.Utils
 
 class ClassData(context: Context) {
 
+    lateinit var departmentName: ArrayList<String>
     lateinit var className: ArrayList<String>
     lateinit var degreeName: ArrayList<String>
     lateinit var yearName: ArrayList<String>
+    lateinit var classType: ArrayList<String>
+    lateinit var classStrength: ArrayList<String>
     private lateinit var mergedDetails: ArrayList<String>
     private val dbHelper = DbHelper(context)
     private val utils = Utils()
 
     fun getClass(): Int {
+        departmentName = ArrayList()
         className = ArrayList()
         degreeName = ArrayList()
         yearName = ArrayList()
+        classType = ArrayList()
+        classStrength = ArrayList()
         val db = dbHelper.writableDatabase
         val cursor: Cursor = db.rawQuery("SELECT * FROM ${utils.TABLE_CLASS_DETAIL}", null)
         return if (cursor.count == 0) {
@@ -27,9 +33,12 @@ class ClassData(context: Context) {
             0
         } else {
             while (cursor.moveToNext()) {
-                degreeName.add(cursor.getString(0))
-                className.add(cursor.getString(1))
-                yearName.add(cursor.getString(2))
+                departmentName.add(cursor.getString(0))
+                degreeName.add(cursor.getString(1))
+                className.add(cursor.getString(2))
+                yearName.add(cursor.getString(3))
+                classType.add(cursor.getString(4))
+                classStrength.add(cursor.getString(5))
             }
             cursor.close()
             1
@@ -40,16 +49,18 @@ class ClassData(context: Context) {
         getClass()
         mergedDetails = ArrayList()
         for (i in 0 until degreeName.size) {
-            mergedDetails.add(degreeName[i] + "-" + className[i] + "-" + yearName[i])
+            mergedDetails.add(degreeName[i] + "-" + className[i] + "-" + yearName[i] + "-" + classType[i])
         }
         return mergedDetails
     }
 
     fun addClass(
+        departmentText: String,
         degreeText: String,
         classText: String,
         yearText: String,
-        classTypeText: String
+        classTypeText: String,
+        strength: String
     ): Long {
         val db: SQLiteDatabase = dbHelper.writableDatabase
         val query =
@@ -62,12 +73,15 @@ class ClassData(context: Context) {
         } else {
             val result: Long
             val contentValue1 = ContentValues()
+            contentValue1.put("department", departmentText)
             contentValue1.put("degree", degreeText)
             contentValue1.put("class", classText)
             contentValue1.put("year", yearText)
             contentValue1.put("class_type", classTypeText)
+            contentValue1.put("strength", strength)
             result = db.insert(utils.TABLE_CLASS_DETAIL, null, contentValue1)
             cursor.close()
+
             result
         }
     }

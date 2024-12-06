@@ -21,7 +21,7 @@ class FetchAttendanceData {
             do {
                 val columnName = cursor.getString(0)
                 println(columnName)
-                val trueQuery = "SELECT name FROM $tableName WHERE $columnName = $valueType;"
+                val trueQuery = "SELECT rollNo FROM $tableName WHERE $columnName = $valueType;"
                 val trueCursor = database.rawQuery(trueQuery, null)
 
                 val trueValues = mutableListOf<String>()
