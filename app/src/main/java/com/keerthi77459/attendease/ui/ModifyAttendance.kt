@@ -3,19 +3,23 @@ package com.keerthi77459.attendease.ui
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import com.keerthi77459.attendease.R
 import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.model.ClassData
@@ -28,13 +32,14 @@ class ModifyAttendance : AppCompatActivity() {
 
     private lateinit var modifyAttendance: Button
     private lateinit var date: TextInputEditText
-    private lateinit var time: TextInputEditText
+    private lateinit var time: AutoCompleteTextView
 
     private lateinit var overallClassDetails: ArrayList<String>
 
     private var maDegreeText: String? = null
     private var maClassText: String? = null
     private var maYearText: String? = null
+    private var maClassType: String? = null
     private var maAttendanceType: String? = null
 
     private lateinit var qaLogic: QuickAttendanceLogic
@@ -48,6 +53,10 @@ class ModifyAttendance : AppCompatActivity() {
 
     private lateinit var rollNoText: Array<String>
     private lateinit var lateralRollNoText: Array<String>
+
+    private lateinit var builder: AlertDialog.Builder
+    private lateinit var v: View
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +79,19 @@ class ModifyAttendance : AppCompatActivity() {
 
         val degreeAdapter: ArrayAdapter<String> =
             ArrayAdapter<String>(this, R.layout.drop_down_text, overallClassDetails)
+
+        val theorySlotAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            R.layout.drop_down_text,
+            resources.getStringArray(R.array.theoryClassSlots)
+        )
+
+        val labSlotAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            R.layout.drop_down_text,
+            resources.getStringArray(R.array.labClassSlots)
+        )
+
         val attendanceTypeAdapter: ArrayAdapter<String> =
             ArrayAdapter<String>(
                 this,
@@ -82,77 +104,39 @@ class ModifyAttendance : AppCompatActivity() {
 
         maDegreeName.onItemClickListener = OnItemClickListener { _, _, _, _ ->
             maDegreeText = maDegreeName.text.toString().split("-")[0]
-            maYearText = maDegreeName.text.toString().split("-")[2]
             maClassText = maDegreeName.text.toString().split("-")[1]
+            maYearText = maDegreeName.text.toString().split("-")[2]
+            maClassType = maDegreeName.text.toString().split("-")[3]
+
+            if (maClassType == resources.getStringArray(R.array.class_type)[0]) {
+                time.setAdapter(theorySlotAdapter)
+            } else if (maClassType == resources.getStringArray(R.array.class_type)[1]) {
+                time.setAdapter(labSlotAdapter)
+            }
         }
 
         maAttendanceTypeName.onItemClickListener = OnItemClickListener { _, _, _, _ ->
             maAttendanceType = maAttendanceTypeName.text.toString()
         }
 
-        val materialDateBuilder: MaterialDatePicker.Builder<*> =
-            MaterialDatePicker.Builder.datePicker().setTitleText("SELECT A DATE")
-
+        val materialDateBuilder: MaterialDatePicker.Builder<Long> =
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("SELECT A DATE")
+                .setCalendarConstraints(
+                    CalendarConstraints.Builder()
+                        .setValidator(DateValidatorPointBackward.now()) // Restrict to past and current dates
+                        .build()
+                )
         val materialDatePicker = materialDateBuilder.build()
 
         date.setOnClickListener {
             materialDatePicker.show(supportFragmentManager, "MATERIAL_DATE_PICKER")
         }
 
-        materialDatePicker.addOnPositiveButtonClickListener {
-            date.setText(materialDatePicker.headerText)
-        }
-
-
-        val materialTimePicker: MaterialTimePicker = MaterialTimePicker.Builder()
-            .setTitleText("SELECT YOUR TIMING")
-            .setHour(12)
-            .setMinute(10)
-            .setTimeFormat(TimeFormat.CLOCK_12H)
-            .build()
-
-        time.setOnClickListener {
-            materialTimePicker.show(supportFragmentManager, "MATERIAL_TIME_PICKER")
-        }
-
-        materialTimePicker.addOnPositiveButtonClickListener {
-            val pickedHour: Int = materialTimePicker.hour
-            val pickedMinute: Int = materialTimePicker.minute
-
-            val formattedTime: String = when {
-                pickedHour > 12 -> {
-                    if (pickedMinute < 10) {
-                        "${materialTimePicker.hour - 12}:0${materialTimePicker.minute} pm"
-                    } else {
-                        "${materialTimePicker.hour - 12}:${materialTimePicker.minute} pm"
-                    }
-                }
-
-                pickedHour == 12 -> {
-                    if (pickedMinute < 10) {
-                        "${materialTimePicker.hour}:0${materialTimePicker.minute} pm"
-                    } else {
-                        "${materialTimePicker.hour}:${materialTimePicker.minute} pm"
-                    }
-                }
-
-                pickedHour == 0 -> {
-                    if (pickedMinute < 10) {
-                        "${materialTimePicker.hour + 12}:0${materialTimePicker.minute} am"
-                    } else {
-                        "${materialTimePicker.hour + 12}:${materialTimePicker.minute} am"
-                    }
-                }
-
-                else -> {
-                    if (pickedMinute < 10) {
-                        "${materialTimePicker.hour}:0${materialTimePicker.minute} am"
-                    } else {
-                        "${materialTimePicker.hour}:${materialTimePicker.minute} am"
-                    }
-                }
-            }
-            time.setText(formattedTime)
+        materialDatePicker.addOnPositiveButtonClickListener { selection ->
+            val sdf = java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault())
+            val formattedDate = sdf.format(selection)
+            date.setText(formattedDate)
         }
 
         modifyAttendance.setOnClickListener {
@@ -163,7 +147,7 @@ class ModifyAttendance : AppCompatActivity() {
             maAttendanceTypeName.error = null
 
             val dateValue = date.text.toString()
-            val timeValue = time.text.toString().split(" ")[0]
+            val timeValue = time.text.toString()
 
             val isValid = validate(maDegreeText, dateValue, timeValue, maAttendanceType)
             Log.d("MA Validation", isValid.toString())
@@ -181,12 +165,13 @@ class ModifyAttendance : AppCompatActivity() {
 
             if (isValid) {
 
-                val date = utils.returnDate(dateValue.split(" ")[0])
+                val hour = utils.returnTimeHour(timeValue.split(":")[0])
+                Log.d("HOUR MODIFICATION", hour)
 
                 val columnName =
-                    "_${date}_${MapDateAndTime().timeDate[dateValue.split(" ")[1]]}_${
+                    "_${dateValue.split(" ")[0]}_${MapDateAndTime().timeDate[dateValue.split(" ")[1]]}_${
                         dateValue.split(" ")[2]
-                    }_${timeValue.split(":")[0]}_${timeValue.split(":")[1]}_00"
+                    }_${hour}_${timeValue.split(":")[1]}_00"
 
                 Log.d("Modify Attendance Column Name", columnName)
 
@@ -207,6 +192,16 @@ class ModifyAttendance : AppCompatActivity() {
                 lateralRollNoText = lateralRollNo.editText!!.text.split(",").toTypedArray()
 
                 if (isInitiated == 1) {
+                    qaLogic.quickAttendance(
+                        db,
+                        utils,
+                        tableName,
+                        rollNoText,
+                        columnName,
+                        lateralRollNoText,
+                        attendanceStatus.second.toString()
+                    )
+                } else if (isInitiated == -1) {
                     qaLogic.quickAttendance(
                         db,
                         utils,
@@ -250,5 +245,47 @@ class ModifyAttendance : AppCompatActivity() {
             return false
         }
         return true
+    }
+
+    private fun displayDialog(
+        db: SQLiteDatabase,
+        utils: Utils,
+        tableName: String,
+        message: String,
+        actualAttendanceState: String
+    ) {
+
+        val displayView: TextView = v.findViewById(R.id.alertbox)
+        displayView.text = message
+        builder.setView(v)
+        builder.setTitle("WARNING")
+            .setPositiveButton("I, Understood") { _, _ ->
+                val latestColumnName: String = sharedPreferences.getString("LatestColumn", null)!!
+
+                qaLogic.quickAttendance(
+                    db,
+                    utils,
+                    tableName,
+                    rollNoText,
+                    latestColumnName,
+                    lateralRollNoText,
+                    actualAttendanceState
+                )
+
+                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_LONG).show()
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+
+            }.setNegativeButton("Cancel") { _, _ ->
+                dialog.dismiss()
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
+
+        dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
     }
 }
