@@ -1,5 +1,7 @@
 package com.keerthi77459.attendease.ui;
 
+import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -29,22 +31,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class GenerateReport extends AppCompatActivity {
 
     Button downloadReport;
     AutoCompleteTextView inpDegreeName;
-    private String inpDegreeText, inpClassText, inpYearText;
+    private String inpDegreeText, inpClassText, inpYearText, inpClassTypeText;
     DbHelper dbHelper;
     Utils utils;
     ArrayList<String> overallClassDetails;
     ClassData classData;
+    int multiplicationConstant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate_report);
 
+        Resources resource = getResources();
         dbHelper = new DbHelper(this);
         classData = new ClassData(this);
         utils = new Utils();
@@ -61,8 +66,15 @@ public class GenerateReport extends AppCompatActivity {
 
         inpDegreeName.setOnItemClickListener((adapterView, view, i, l) -> {
             inpDegreeText = inpDegreeName.getText().toString().split("-")[0];
-            inpYearText = inpDegreeName.getText().toString().split("-")[2];
             inpClassText = inpDegreeName.getText().toString().split("-")[1];
+            inpYearText = inpDegreeName.getText().toString().split("-")[2];
+            inpClassTypeText = inpDegreeName.getText().toString().split("-")[3];
+
+            if (Objects.equals(inpClassTypeText, resource.getStringArray(R.array.class_type)[0])) {
+                multiplicationConstant = 1;
+            } else if (Objects.equals(inpClassTypeText, resource.getStringArray(R.array.class_type)[1])) {
+                multiplicationConstant = 3;
+            }
         });
 
         downloadReport.setOnClickListener(view -> {
@@ -99,13 +111,30 @@ public class GenerateReport extends AppCompatActivity {
         }
 
         int rowIndex = 1;
+
         while (cursor.moveToNext()) {
             Row row = daySheet.createRow(rowIndex);
             for (int i = 0; i < columnNames.length; i++) {
                 Cell cell = row.createCell(i);
+                if (i > 2) {
+                    int cell_value = Integer.parseInt(cursor.getString(i)) * multiplicationConstant;
+                    cell.setCellValue(cell_value);
+                }
                 cell.setCellValue(cursor.getString(i));
             }
             rowIndex++;
+        }
+
+        Row absentRow = daySheet.createRow(rowIndex);
+        Cell nameAbsentcell = absentRow.createCell(0);
+        nameAbsentcell.setCellValue("Absentees Count");
+        for (int i = 2; i < columnNames.length; i++) {
+            Cell cell = absentRow.createCell(i);
+            String absentQuery = "SELECT COUNT(*) FROM " + tableName + " WHERE `" + columnNames[i] + "`= 0";
+            System.out.println(absentQuery);
+            @SuppressLint("Recycle") Cursor absentCursor = database.rawQuery(absentQuery, null);
+            absentCursor.moveToFirst();
+            cell.setCellValue(absentCursor.getInt(0));
         }
 
         cursor.close();
@@ -143,6 +172,9 @@ public class GenerateReport extends AppCompatActivity {
             monthAttendanceQuery.append(") AS ").append(monthNames[Integer.parseInt(month) - 1]).append(", ");
             columnSelectionQuery.close();
         }
+
+//        TODO : ADD SUM AND PERCENTAGE
+
         monthAttendanceQuery.setLength(monthAttendanceQuery.length() - 2);
         monthAttendanceQuery.append(" FROM ").append(tableName).append(" GROUP BY rollNo");
 
