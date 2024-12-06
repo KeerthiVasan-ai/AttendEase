@@ -54,7 +54,7 @@ public class ProcessExcel {
                 if (rowsCount > 0) {
                     for (int r = 1; r < rowsCount; r++) {
                         Row row = sheet.getRow(r);
-                        if (row.getPhysicalNumberOfCells() == 4) {
+                        if (row.getPhysicalNumberOfCells() == 3) {
                             String rollNo = getCellData(row, 0, formulaEvaluator);
                             String name = getCellData(row, 1, formulaEvaluator);
 //                            String phoneNumber = getCellData(row, 2, formulaEvaluator);
@@ -109,7 +109,7 @@ public class ProcessExcel {
                 if (rowsCount > 0) {
                     for (int r = 1; r < rowsCount; r++) {
                         HSSFRow row = sheet.getRow(r);
-                        if (row.getPhysicalNumberOfCells() == 4) {
+                        if (row.getPhysicalNumberOfCells() == 3) {
                             String rollNo = getCellData(row, 0, formulaEvaluator);
                             String name = getCellData(row, 1, formulaEvaluator);
 //                            String phoneNumber = getCellData(row, 2, formulaEvaluator);
