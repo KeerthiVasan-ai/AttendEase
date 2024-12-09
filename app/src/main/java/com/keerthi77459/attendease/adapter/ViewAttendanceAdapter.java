@@ -1,17 +1,13 @@
 package com.keerthi77459.attendease.adapter;
 
-import static android.view.View.INVISIBLE;
-
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +21,7 @@ import com.keerthi77459.attendease.model.AttendanceData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ViewAttendanceAdapter extends RecyclerView.Adapter<ViewAttendanceViewHolder> {
@@ -52,7 +49,7 @@ public class ViewAttendanceAdapter extends RecyclerView.Adapter<ViewAttendanceVi
         AttendanceData data = attendanceData.get(position);
 
         String columnName = formatColumnName(data.getColumnName());
-        String attendanceDetails = formatAttendanceStatusData(data.getTrueValues());
+        String attendanceDetails = formatAttendanceStatusData(data.getAttendanceDataBasedOnGroup());
 
         holder.nameTextView.setText(columnName);
         holder.attendanceStatus.setText(attendanceDetails);
@@ -92,23 +89,25 @@ public class ViewAttendanceAdapter extends RecyclerView.Adapter<ViewAttendanceVi
         return "Date :" + columnNameElement[1] + "-" + columnNameElement[2] + "-" + columnNameElement[3] + "  Time :" + columnNameElement[4] + ":" + columnNameElement[5];
     }
 
-    private String formatAttendanceStatusData(List<String> attendanceData) {
-        StringBuilder attendanceStatusData = new StringBuilder();
+    private String formatAttendanceStatusData(Map<String, List<String>> attendanceData) {
         if (attendanceData.isEmpty()) {
             return "Nil";
         }
-        for (int i = 0; i < attendanceData.size(); i++) {
-            String detail = attendanceData.get(i);
-            String lastThreeChars = detail.substring(detail.length() - 3).replaceFirst("^0+", "");
 
-            attendanceStatusData.append(lastThreeChars);
+        StringBuilder attendanceStatusData = new StringBuilder();
 
-            if (i < attendanceData.size() - 1) {
-                attendanceStatusData.append(",");
-            }
+        for (Map.Entry<String, List<String>> entry : attendanceData.entrySet()) {
+            String mode = entry.getKey();
+            List<String> rollNumbers = entry.getValue();
+
+            attendanceStatusData.append(mode).append(" : ");
+            attendanceStatusData.append(String.join(", ", rollNumbers));
+            attendanceStatusData.append("\n");
         }
-        return attendanceStatusData.toString();
+
+        return attendanceStatusData.toString().trim();
     }
+
 }
 
 class ViewAttendanceViewHolder extends RecyclerView.ViewHolder {
@@ -125,23 +124,20 @@ class ViewAttendanceViewHolder extends RecyclerView.ViewHolder {
 
         deleteButton.setVisibility(View.INVISIBLE);
 
-        itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                String dataToCopy = nameTextView.getText().toString() + "\n" + attendanceStatus.getText().toString();  // Replace itemName with the actual data
+        itemView.setOnLongClickListener(view -> {
+            String dataToCopy = nameTextView.getText().toString() + "\n" + attendanceStatus.getText().toString();  // Replace itemName with the actual data
 
-                ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
 
-                ClipData clip = ClipData.newPlainText("item_name", dataToCopy);
+            ClipData clip = ClipData.newPlainText("item_name", dataToCopy);
 
-                if (clipboard != null) {
-                    clipboard.setPrimaryClip(clip);
-                }
-
-                Toast.makeText(view.getContext(), "Item copied to clipboard", Toast.LENGTH_SHORT).show();
-
-                return true;
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(clip);
             }
+
+            Toast.makeText(view.getContext(), "Attendance Copied to clipboard", Toast.LENGTH_SHORT).show();
+
+            return true;
         });
 
 
