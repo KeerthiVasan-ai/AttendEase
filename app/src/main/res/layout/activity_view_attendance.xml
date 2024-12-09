@@ -28,14 +28,14 @@
                 android:id="@+id/text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="18dp"
                 android:textColor="@color/black"
                 android:fontFamily="@font/poppinsbold"
                 android:text="@string/view_attendance"
                 app:layout_constraintTop_toTopOf="@id/innerLayout1"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                />
+                tools:ignore="SpUsage" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/vaDegreeNameField"

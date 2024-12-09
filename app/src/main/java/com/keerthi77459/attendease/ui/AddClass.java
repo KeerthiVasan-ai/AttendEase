@@ -232,12 +232,12 @@ public class AddClass extends AppCompatActivity {
     }
 
     private void fetchClassNames(String departmentName, String institutionId, String classType) {
-
+        Log.d("Class Type", classType);
         List<String> subCollectionIds = new ArrayList<>();
         if (Objects.equals(institutionId, "")) {
             Toast.makeText(this, "Some Problem With your Institution", Toast.LENGTH_LONG).show();
         } else {
-            db.collection(institutionId).document(departmentName).collection(classType.toLowerCase()).get().addOnCompleteListener(task -> {
+            db.collection(institutionId).document(departmentName).collection(classType).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot subCollection : task.getResult()) {
                         subCollectionIds.add(subCollection.getId());
@@ -252,15 +252,27 @@ public class AddClass extends AppCompatActivity {
     }
 
     private void fetchClassStrength(String institutionId, String departmentName, String classType, String className) {
-        db.collection(institutionId).document(departmentName).collection(classType.toLowerCase()).document(className).collection("info").document("details").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Map<String, Object> data = task.getResult().getData();
-                if (data != null) {
-                    String strength = (String) data.get("strength");
-                    classStrength.setText(strength);
-                }
-            }
-        });
+        db.collection(institutionId).document(departmentName).collection(classType).document(className)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        Map<String, Object> data = task.getResult().getData();
+                        if (data != null) {
+                            String strength = (String) data.get("strength");
+                            if (strength != null) {
+                                classStrength.setText(strength);
+                                Log.d("Firestore", "Strength: " + strength);
+                            } else {
+                                Log.w("Firestore", "Strength field is missing in the document.");
+                            }
+                        } else {
+                            Log.w("Firestore", "No data found in the document.");
+                        }
+                    } else {
+                        Log.e("Firestore", "Error fetching document", task.getException());
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Failed to fetch document", e));
     }
 
 

@@ -150,12 +150,16 @@ public class GenerateReport extends AppCompatActivity {
 //--------------------------------------------------------------------------------------------------
 
         Sheet monthSheet = workbook.createSheet("MonthWiseDetails");
+        Sheet tierOneSheet = workbook.createSheet("Below 75 and Above and Equal 50");
+        Sheet tierTwoSheet = workbook.createSheet("Below 50 and Above and Equal 30");
+        Sheet tierThreeSheet = workbook.createSheet("Below 30");
 
         String[] resourceMonths = getResources().getStringArray(R.array.month);
         String[] monthNames = getResources().getStringArray(R.array.monthName);
         StringBuilder monthAttendanceQuery = new StringBuilder("SELECT rollNo, name,");
 
         List<String> availableMonths = new ArrayList<>();
+
         for (String month : resourceMonths) {
             Log.d("MONTH CHECK", month);
 
@@ -181,20 +185,60 @@ public class GenerateReport extends AppCompatActivity {
         Log.d("MONTH QUERY", monthWiseAttendanceQuery);
         Cursor resultCursor = database.rawQuery(monthWiseAttendanceQuery, null);
 
+
         Row headerRow1 = monthSheet.createRow(0);
+        Row headerRow2 = tierOneSheet.createRow(0);
+        Row headerRow3 = tierTwoSheet.createRow(0);
+        Row headerRow4 = tierThreeSheet.createRow(0);
+
         headerRow1.createCell(0).setCellValue("RollNo");
         headerRow1.createCell(1).setCellValue("Name");
 
+        headerRow2.createCell(0).setCellValue("RollNo");
+        headerRow2.createCell(1).setCellValue("Name");
+
+        headerRow3.createCell(0).setCellValue("RollNo");
+        headerRow3.createCell(1).setCellValue("Name");
+
+        headerRow4.createCell(0).setCellValue("RollNo");
+        headerRow4.createCell(1).setCellValue("Name");
+
         for (int i = 0; i < availableMonths.size(); i++) {
             headerRow1.createCell(2 + i).setCellValue(monthNames[Integer.parseInt(availableMonths.get(i)) - 1]);
+            headerRow2.createCell(2 + i).setCellValue(monthNames[Integer.parseInt(availableMonths.get(i)) - 1]);
+            headerRow3.createCell(2 + i).setCellValue(monthNames[Integer.parseInt(availableMonths.get(i)) - 1]);
+            headerRow4.createCell(2 + i).setCellValue(monthNames[Integer.parseInt(availableMonths.get(i)) - 1]);
+
         }
         headerRow1.createCell(2 + availableMonths.size()).setCellValue("Cumulative");
         headerRow1.createCell(3 + availableMonths.size()).setCellValue("Percentage");
 
+        headerRow2.createCell(2 + availableMonths.size()).setCellValue("Cumulative");
+        headerRow2.createCell(3 + availableMonths.size()).setCellValue("Percentage");
+
+        headerRow3.createCell(2 + availableMonths.size()).setCellValue("Cumulative");
+        headerRow3.createCell(3 + availableMonths.size()).setCellValue("Percentage");
+
+        headerRow4.createCell(2 + availableMonths.size()).setCellValue("Cumulative");
+        headerRow4.createCell(3 + availableMonths.size()).setCellValue("Percentage");
+
 
         Row totalColumnsRow = monthSheet.createRow(1);
+        Row totalColumnsRow1 = tierOneSheet.createRow(1);
+        Row totalColumnsRow2 = tierTwoSheet.createRow(1);
+        Row totalColumnsRow3 = tierThreeSheet.createRow(1);
+
         totalColumnsRow.createCell(0).setCellValue("");
         totalColumnsRow.createCell(1).setCellValue("Total Columns");
+
+        totalColumnsRow1.createCell(0).setCellValue("");
+        totalColumnsRow1.createCell(1).setCellValue("Total Columns");
+
+        totalColumnsRow2.createCell(0).setCellValue("");
+        totalColumnsRow2.createCell(1).setCellValue("Total Columns");
+
+        totalColumnsRow3.createCell(0).setCellValue("");
+        totalColumnsRow3.createCell(1).setCellValue("Total Columns");
 
         int cumulativeTotal = 0;
 
@@ -204,13 +248,30 @@ public class GenerateReport extends AppCompatActivity {
             if (countCursor.moveToFirst()) {
                 cumulativeTotal += countCursor.getInt(0) * multiplicationConstant;
                 totalColumnsRow.createCell(2 + i).setCellValue((countCursor.getInt(0) * multiplicationConstant));
+                totalColumnsRow1.createCell(2 + i).setCellValue((countCursor.getInt(0) * multiplicationConstant));
+                totalColumnsRow2.createCell(2 + i).setCellValue((countCursor.getInt(0) * multiplicationConstant));
+                totalColumnsRow3.createCell(2 + i).setCellValue((countCursor.getInt(0) * multiplicationConstant));
+
             }
             countCursor.close();
         }
         totalColumnsRow.createCell(2 + availableMonths.size()).setCellValue(cumulativeTotal);
         totalColumnsRow.createCell(3 + availableMonths.size()).setCellValue("100 %");
 
+        totalColumnsRow1.createCell(2 + availableMonths.size()).setCellValue(cumulativeTotal);
+        totalColumnsRow1.createCell(3 + availableMonths.size()).setCellValue("100 %");
+
+        totalColumnsRow2.createCell(2 + availableMonths.size()).setCellValue(cumulativeTotal);
+        totalColumnsRow2.createCell(3 + availableMonths.size()).setCellValue("100 %");
+
+        totalColumnsRow3.createCell(2 + availableMonths.size()).setCellValue(cumulativeTotal);
+        totalColumnsRow3.createCell(3 + availableMonths.size()).setCellValue("100 %");
+
         int rowIndex1 = 2;
+        int tierOneIndex = 2;
+        int tierTwoIndex = 2;
+        int tierThreeIndex = 2;
+
         while (resultCursor.moveToNext()) {
             Row row1 = monthSheet.createRow(rowIndex1);
             row1.createCell(0).setCellValue(resultCursor.getString(0));
@@ -229,14 +290,73 @@ public class GenerateReport extends AppCompatActivity {
             CellStyle cellStyle = workbook.createCellStyle();
 
             if (percentage < 75.0 && percentage >= 50) {
+
                 cellStyle.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
                 cellStyle.setFillPattern((short) 1);
+
+                Row row2 = tierOneSheet.createRow(tierOneIndex);
+                row2.createCell(0).setCellValue(resultCursor.getString(0));
+                row2.createCell(1).setCellValue(resultCursor.getString(1));
+
+                int tiersCumulativeSum = 0;
+                for (int i = 0; i < availableMonths.size(); i++) {
+                    int attendance = resultCursor.getInt(2 + i) * multiplicationConstant;
+                    row2.createCell(2 + i).setCellValue(attendance);
+                    cumulativeSum += attendance;
+                }
+
+                row2.createCell(2 + availableMonths.size()).setCellValue(tiersCumulativeSum);
+                String formattedPercentage = String.format(Locale.US, "%.2f", percentage);
+                Cell cell1 = row2.createCell(3 + availableMonths.size());
+                cell1.setCellValue(formattedPercentage + "%");
+
+                tierOneIndex++;
+
             } else if (percentage < 50 && percentage >= 30) {
+
                 cellStyle.setFillForegroundColor(IndexedColors.LIGHT_ORANGE.getIndex());
                 cellStyle.setFillPattern((short) 1);
+
+                Row row2 = tierTwoSheet.createRow(tierTwoIndex);
+                row2.createCell(0).setCellValue(resultCursor.getString(0));
+                row2.createCell(1).setCellValue(resultCursor.getString(1));
+
+                int tiersCumulativeSum = 0;
+                for (int i = 0; i < availableMonths.size(); i++) {
+                    int attendance = resultCursor.getInt(2 + i) * multiplicationConstant;
+                    row2.createCell(2 + i).setCellValue(attendance);
+                    cumulativeSum += attendance;
+                }
+
+                row2.createCell(2 + availableMonths.size()).setCellValue(tiersCumulativeSum);
+                String formattedPercentage = String.format(Locale.US, "%.2f", percentage);
+                Cell cell1 = row2.createCell(3 + availableMonths.size());
+                cell1.setCellValue(formattedPercentage + "%");
+
+                tierTwoIndex++;
+
             } else if (percentage < 30) {
+
                 cellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
                 cellStyle.setFillPattern((short) 1);
+
+                Row row2 = tierThreeSheet.createRow(tierThreeIndex);
+                row2.createCell(0).setCellValue(resultCursor.getString(0));
+                row2.createCell(1).setCellValue(resultCursor.getString(1));
+
+                int tiersCumulativeSum = 0;
+                for (int i = 0; i < availableMonths.size(); i++) {
+                    int attendance = resultCursor.getInt(2 + i) * multiplicationConstant;
+                    row2.createCell(2 + i).setCellValue(attendance);
+                    cumulativeSum += attendance;
+                }
+
+                row2.createCell(2 + availableMonths.size()).setCellValue(tiersCumulativeSum);
+                String formattedPercentage = String.format(Locale.US, "%.2f", percentage);
+                Cell cell1 = row2.createCell(3 + availableMonths.size());
+                cell1.setCellValue(formattedPercentage + "%");
+
+                tierThreeIndex++;
             }
 
             String formattedPercentage = String.format(Locale.US, "%.2f", percentage);
@@ -246,11 +366,10 @@ public class GenerateReport extends AppCompatActivity {
 
             rowIndex1++;
 
+
         }
 
         resultCursor.close();
-
-
         saveFile(workbook);
     }
 

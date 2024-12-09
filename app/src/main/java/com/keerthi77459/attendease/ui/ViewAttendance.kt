@@ -17,7 +17,6 @@ import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.model.AttendanceData
 import com.keerthi77459.attendease.model.ClassData
 import com.keerthi77459.attendease.utils.Utils
-import com.keerthi77459.attendease.viewmodel.FetchAttendanceData
 import com.keerthi77459.attendease.viewmodel.FetchAttendanceDataNew
 import com.keerthi77459.attendease.viewmodel.MapDateAndTime
 
@@ -47,7 +46,6 @@ class ViewAttendance : AppCompatActivity() {
 
         val utils = Utils()
         val dbHelper = DbHelper(this)
-        val fetchAttendanceData = FetchAttendanceData()
         val classData = ClassData(this)
         overallClassDetails = classData.mergedClassDetails()
 

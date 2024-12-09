@@ -18,9 +18,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputLayout
 import com.keerthi77459.attendease.R
+import com.keerthi77459.attendease.cloud.AttendanceDataToCloud
 import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.model.ClassData
 import com.keerthi77459.attendease.utils.Utils
+import com.keerthi77459.attendease.viewmodel.FetchDataForCloud
 import com.keerthi77459.attendease.viewmodel.Logic
 import com.keerthi77459.attendease.viewmodel.QuickAttendanceLogic
 
@@ -125,10 +127,6 @@ class QuickAttendance : AppCompatActivity() {
             qaTimeName.error = null
             qaAttendanceTypeName.error = null
 
-//            sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-//            val lastRunTime: Long = sharedPreferences.getLong("LastRunTime", -1)
-//            val lastTableName: String = sharedPreferences.getString("LastTableName", "class")!!
-
             val columnName = utils.getColumnName(time = qaTimeText.toString())
 
             val isValid = validate(qaDegreeText, qaTimeText, qaAttendanceType)
@@ -167,7 +165,23 @@ class QuickAttendance : AppCompatActivity() {
                         attendanceStatus.second.toString()
                     )
 
-                    Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
+                    val institutionId = utils.getInstitutionId(this)
+                    val departmentName = utils.getDepartmentName(db, tableName)
+                    val cloudClassName = "$qaDegreeText-$qaClassText-$qaYearText"
+
+                    val cloudData =
+                        FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+                    AttendanceDataToCloud().insertAttendanceData(
+                        institutionId!!,
+                        departmentName,
+                        qaClassTypeText.toString(),
+                        cloudClassName,
+                        columnName,
+                        cloudData
+                    )
+
+                    Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_SHORT)
                         .show()
                     val intent = Intent(this, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -180,7 +194,8 @@ class QuickAttendance : AppCompatActivity() {
                         tableName,
                         Utils().ATTENDANCE_UPDATE_WARNING,
                         attendanceStatus.second.toString(),
-                        columnName
+                        columnName,
+                        qaDegreeText, qaClassText, qaYearText, qaClassTypeText
                     )
                     Toast.makeText(this, "Make New Attendance After 45 Minutes", Toast.LENGTH_SHORT)
                         .show()
@@ -211,7 +226,12 @@ class QuickAttendance : AppCompatActivity() {
         tableName: String,
         message: String,
         actualAttendanceState: String,
-        columnName: String
+        columnName: String,
+        qaDegreeText: String?,
+        qaClassText: String?,
+        qaYearText: String?,
+        qaClassTypeText: String?
+
     ) {
 
         val displayView: TextView = v.findViewById(R.id.alertbox)
@@ -227,6 +247,22 @@ class QuickAttendance : AppCompatActivity() {
                 columnName,
                 lateralRollNoText,
                 actualAttendanceState
+            )
+
+            val institutionId = utils.getInstitutionId(this)
+            val departmentName = utils.getDepartmentName(db, tableName)
+            val cloudClassName = "$qaDegreeText-$qaClassText-$qaYearText"
+
+            val cloudData =
+                FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+            AttendanceDataToCloud().insertAttendanceData(
+                institutionId!!,
+                departmentName,
+                qaClassTypeText.toString(),
+                cloudClassName,
+                columnName,
+                cloudData
             )
 
             Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()

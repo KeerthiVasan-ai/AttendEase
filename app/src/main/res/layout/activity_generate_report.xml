@@ -1,112 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/background1"
-    android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    android:padding="12dp"
     tools:context=".ui.GenerateReport">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardUseCompatPadding="true"
         app:cardCornerRadius="8dp"
         app:cardElevation="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/innerLayout"
-        android:padding="32dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/text2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:fontFamily="@font/poppinsbold"
-            android:text="@string/generate_attendance_report"
-            app:layout_constraintTop_toTopOf="@id/innerLayout"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inpDegreeNameField"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/innerLayout"
             android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/text2">
+            android:layout_height="match_parent"
+            android:padding="32dp">
 
-            <AutoCompleteTextView
-                android:id="@+id/inpDegreeName"
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppinsbold"
+                android:text="@string/generate_attendance_report"
+                android:textColor="@color/black"
+                android:textSize="18dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/innerLayout"
+                tools:ignore="SpUsage" />
+
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppinsbold"
+                android:textAlignment="center"
+                android:text="@string/note_files_will_be_stored_at_n_local_storage_downloads_attendease"
+                android:textColor="@color/black"
+                android:textSize="12dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text2"
+                tools:ignore="SpUsage" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inpDegreeNameField"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fontFamily="@font/ebgaramondmedium"
-                android:layout_weight="1"
-                android:inputType="none"
-                android:hint="@string/choose_class"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintTop_toBottomOf="@id/text3">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <AutoCompleteTextView
+                    android:id="@+id/inpDegreeName"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/ebgaramondmedium"
+                    android:hint="@string/choose_class"
+                    android:inputType="none" />
 
-<!--        <com.google.android.material.textfield.TextInputLayout-->
-<!--            android:id="@+id/inpClassNameField"-->
-<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField"-->
-<!--            >-->
+            </com.google.android.material.textfield.TextInputLayout>
 
-<!--            <AutoCompleteTextView-->
-<!--                android:id="@+id/inpClassName"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="1"-->
-<!--                android:fontFamily="@font/ebgaramondmedium"-->
-<!--                android:inputType="none"-->
-<!--                android:hint="Chose Class"/>-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/downloadReport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/ebgaramondsemibold"
+                android:text="@string/generate_report"
+                app:cornerRadius="4dp"
+                app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField" />
 
-<!--        </com.google.android.material.textfield.TextInputLayout>-->
-
-<!--        <com.google.android.material.textfield.TextInputLayout-->
-<!--            android:id="@+id/inpYearNameField"-->
-<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/inpClassNameField"-->
-<!--            >-->
-
-<!--            <AutoCompleteTextView-->
-<!--                android:id="@+id/inpYearName"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="1"-->
-<!--                android:fontFamily="@font/ebgaramondmedium"-->
-<!--                android:inputType="none"-->
-<!--                android:hint="Chose Semester"/>-->
-
-<!--        </com.google.android.material.textfield.TextInputLayout>-->
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/downloadReport"
-            android:layout_width="match_parent"
-            android:layout_marginTop="16dp"
-            android:layout_height="wrap_content"
-            app:cornerRadius="4dp"
-            android:fontFamily="@font/ebgaramondsemibold"
-            android:text="Generate Report"
-            app:layout_constraintTop_toBottomOf="@id/inpDegreeNameField"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 

@@ -46,7 +46,7 @@ class OnBoarding : AppCompatActivity() {
                             editor.putStringSet("departmentsName", data.toSet())
                             editor.apply()
 
-                            val intent = Intent(this@OnBoarding, LoginScreen::class.java)
+                            val intent = Intent(this@OnBoarding, MainActivity::class.java)
                             intent.flags =
                                 Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(intent)

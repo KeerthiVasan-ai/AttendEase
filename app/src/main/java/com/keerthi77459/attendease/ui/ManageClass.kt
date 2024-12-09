@@ -11,7 +11,7 @@ import com.keerthi77459.attendease.model.ClassData
 
 class ManageClass : AppCompatActivity() {
 
-    lateinit var recycle3 : RecyclerView
+    lateinit var recycle3: RecyclerView
     lateinit var manageClassAdapter: ManageClassAdapter
 
 
@@ -22,12 +22,18 @@ class ManageClass : AppCompatActivity() {
         val classData = ClassData(this)
 
         recycle3 = findViewById(R.id.recycle3)
-        val toolbar : Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar!!.title = "Manage Class"
 
         classData.getClass()
-        manageClassAdapter = ManageClassAdapter(this,classData.degreeName,classData.className,classData.yearName)
+        manageClassAdapter = ManageClassAdapter(
+            this,
+            classData.departmentName,
+            classData.mergedClassDetails(),
+            classData.classType,
+            classData.classStrength
+        )
         recycle3.adapter = manageClassAdapter
         recycle3.layoutManager = LinearLayoutManager(this)
     }

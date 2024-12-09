@@ -30,10 +30,11 @@
                 android:fontFamily="@font/poppinsbold"
                 android:text="@string/quick_attendance"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="18dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/innerLayout1" />
+                app:layout_constraintTop_toTopOf="@id/innerLayout1"
+                tools:ignore="SpUsage" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/qaDegreeNameField"
@@ -100,10 +101,25 @@
                 android:fontFamily="@font/ebgaramondbold"
                 android:text="@string/attendance_details"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="18dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/qaAttendanceTypeField" />
+                app:layout_constraintTop_toBottomOf="@id/qaAttendanceTypeField"
+                tools:ignore="SpUsage" />
+
+            <TextView
+                android:id="@+id/text4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/ebgaramondbold"
+                android:text="@string/note_enter_the_comma_seperated_values"
+                android:textColor="@color/black"
+                android:textSize="12dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text3"
+                tools:ignore="SpUsage" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/rollNoField"
@@ -111,14 +127,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Roll Number"
-                app:layout_constraintTop_toBottomOf="@id/text3">
+                android:hint="@string/roll_number"
+                app:layout_constraintTop_toBottomOf="@id/text4">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/rollNo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/ebgaramondmedium" />
+                    android:fontFamily="@font/ebgaramondmedium"
+                    android:inputType="numberDecimal"
+                    android:digits="0123456789," />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -128,14 +146,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Lateral Entry Number"
+                android:hint="@string/lateral_entry_number"
                 app:layout_constraintTop_toBottomOf="@id/rollNoField">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/lateralRollNo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/ebgaramondmedium" />
+                    android:fontFamily="@font/ebgaramondmedium"
+                    android:inputType="numberDecimal"
+                    android:digits="0123456789," />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -154,21 +174,3 @@
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <!--            <com.google.android.material.textfield.TextInputLayout-->
-    <!--                android:id="@+id/qaClassNameField"-->
-    <!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-    <!--                android:layout_marginTop="16dp"-->
-    <!--                android:layout_width="match_parent"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:hint="Class"-->
-    <!--                app:layout_constraintTop_toBottomOf="@id/qaDegreeNameField">-->
-
-    <!--                <com.google.android.material.textfield.TextInputEditText-->
-    <!--                    android:fontFamily="@font/ebgaramondmedium"-->
-    <!--                    android:id="@+id/qaClassName"-->
-    <!--                    android:layout_width="match_parent"-->
-    <!--                    android:layout_height="wrap_content"/>-->
-
-    <!--            </com.google.android.material.textfield.TextInputLayout>-->

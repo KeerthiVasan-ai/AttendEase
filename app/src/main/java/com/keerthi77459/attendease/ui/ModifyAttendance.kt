@@ -23,9 +23,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.keerthi77459.attendease.R
+import com.keerthi77459.attendease.cloud.AttendanceDataToCloud
 import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.model.ClassData
 import com.keerthi77459.attendease.utils.Utils
+import com.keerthi77459.attendease.viewmodel.FetchDataForCloud
 import com.keerthi77459.attendease.viewmodel.Logic
 import com.keerthi77459.attendease.viewmodel.QuickAttendanceLogic
 
@@ -157,7 +159,7 @@ class ModifyAttendance : AppCompatActivity() {
             val isValid = validate(maDegreeText, dateValue, timeValue, maAttendanceType)
             Log.d("MA Validation", isValid.toString())
 
-            val tableName = maDegreeText + "_" + maClassText + "_" + maYearText
+            val tableName = maDegreeText + "_" + maClassText + "_" + maYearText + "_" + maClassType
 
             sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
 
@@ -194,6 +196,30 @@ class ModifyAttendance : AppCompatActivity() {
                         lateralRollNoText,
                         attendanceStatus.second.toString()
                     )
+
+                    val institutionId = utils.getInstitutionId(this)
+                    val departmentName = utils.getDepartmentName(db, tableName)
+                    val cloudClassName = "$maDegreeText-$maClassText-$maYearText"
+
+                    val cloudData =
+                        FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+                    AttendanceDataToCloud().insertAttendanceData(
+                        institutionId!!,
+                        departmentName,
+                        maClassType.toString(),
+                        cloudClassName,
+                        columnName,
+                        cloudData
+                    )
+
+                    Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_SHORT)
+                        .show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+
+
                 } else {
                     displayDialog(
                         db,
@@ -201,16 +227,11 @@ class ModifyAttendance : AppCompatActivity() {
                         tableName,
                         utils.ATTENDANCE_UPDATE_WARNING,
                         attendanceStatus.second.toString(),
-                        columnName
+                        columnName,
+                        maDegreeText, maClassText, maYearText, maClassType
                     )
                 }
             }
-
-            Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_SHORT)
-                .show()
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
         }
     }
 
@@ -245,7 +266,11 @@ class ModifyAttendance : AppCompatActivity() {
         tableName: String,
         message: String,
         actualAttendanceState: String,
-        columnName: String
+        columnName: String,
+        maDegreeText: String?,
+        maClassText: String?,
+        maYearText: String?,
+        maClassTypeText: String?
     ) {
 
         val displayView: TextView = v.findViewById(R.id.alertbox)
@@ -262,6 +287,22 @@ class ModifyAttendance : AppCompatActivity() {
                     columnName,
                     lateralRollNoText,
                     actualAttendanceState
+                )
+
+                val institutionId = utils.getInstitutionId(this)
+                val departmentName = utils.getDepartmentName(db, tableName)
+                val cloudClassName = "$maDegreeText-$maClassText-$maYearText"
+
+                val cloudData =
+                    FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+                AttendanceDataToCloud().insertAttendanceData(
+                    institutionId!!,
+                    departmentName,
+                    maClassTypeText.toString(),
+                    cloudClassName,
+                    columnName,
+                    cloudData
                 )
 
                 Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()

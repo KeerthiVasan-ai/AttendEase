@@ -21,10 +21,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.keerthi77459.attendease.R
 import com.keerthi77459.attendease.adapter.StudentDetailAdapter
+import com.keerthi77459.attendease.cloud.AttendanceDataToCloud
 import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.viewmodel.Logic
 import com.keerthi77459.attendease.model.StudentData
 import com.keerthi77459.attendease.utils.Utils
+import com.keerthi77459.attendease.viewmodel.FetchDataForCloud
 import java.util.*
 
 class StudentDetail : AppCompatActivity() {
@@ -147,6 +149,22 @@ class StudentDetail : AppCompatActivity() {
                     )
                 }
 
+                val institutionId = utils.getInstitutionId(this)
+                val departmentName = utils.getDepartmentName(db, tableName)
+                val cloudClassName = "$outDegreeName-$outClassName-$outYearName"
+
+                val cloudData =
+                    FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+                AttendanceDataToCloud().insertAttendanceData(
+                    institutionId!!,
+                    departmentName,
+                    classType,
+                    cloudClassName,
+                    columnName,
+                    cloudData
+                )
+
                 println(absentNumber)
                 Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
                     .show()
@@ -156,7 +174,16 @@ class StudentDetail : AppCompatActivity() {
                 startActivity(intent)
 
             } else {
-                displayDialog(db, Utils().ATTENDANCE_UPDATE_WARNING, columnName)
+                displayDialog(
+                    db,
+                    Utils().ATTENDANCE_UPDATE_WARNING,
+                    columnName,
+                    utils,
+                    outDegreeName,
+                    outClassName,
+                    outYearName,
+                    classType
+                )
             }
         }
     }
@@ -203,7 +230,16 @@ class StudentDetail : AppCompatActivity() {
         return true
     }
 
-    private fun displayDialog(db: SQLiteDatabase, message: String, columnName: String) {
+    private fun displayDialog(
+        db: SQLiteDatabase,
+        message: String,
+        columnName: String,
+        utils: Utils,
+        outDegreeName: String,
+        outClassName: String,
+        outYearName: String,
+        classType: String
+    ) {
 
         val displayView: TextView = v.findViewById(R.id.alertbox)
         displayView.text = message
@@ -220,6 +256,22 @@ class StudentDetail : AppCompatActivity() {
                         arrayOf(absent)
                     )
                 }
+
+                val institutionId = utils.getInstitutionId(this)
+                val departmentName = utils.getDepartmentName(db, tableName)
+                val cloudClassName = "$outDegreeName-$outClassName-$outYearName"
+
+                val cloudData =
+                    FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+                AttendanceDataToCloud().insertAttendanceData(
+                    institutionId!!,
+                    departmentName,
+                    classType,
+                    cloudClassName,
+                    columnName,
+                    cloudData
+                )
 
                 Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
