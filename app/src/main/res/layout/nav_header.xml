@@ -9,21 +9,24 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"/>
+        android:contentDescription="@string/app_logo"
+        android:src="@mipmap/ic_launcher" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/poppinsbold"
         android:gravity="center"
         android:text="@string/app_name"
         android:textColor="@color/black"
-        android:textSize="16sp"
-        android:fontFamily="@font/poppinsbold"/>
+        android:textSize="16sp" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="An Easy Attendance Manager"
-        android:textSize="12sp"
         android:fontFamily="@font/ebgaramondmedium"
-        android:textColor="@color/black"/>
+        android:gravity="center"
+        android:text="@string/an_easy_attendance_manager"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
 </LinearLayout>
