@@ -11,39 +11,42 @@ class Logic(context: Context) {
     private val utils = Utils()
 
     fun attendanceLogic(
-        sharedPreferences: SharedPreferences,
-        lastRunTime: Long,
-        lastTableName: String,
+//        sharedPreferences: SharedPreferences,
+//        lastRunTime: Long,
+//        lastTableName: String,
         tableName: String,
         initialAttendanceState: String,
         columnName: String,
-        isModify: Boolean
+//        isModify: Boolean
     ): Int {
-        if (((utils.CURRENT_TIME - lastRunTime) > utils.COMPARISON_CONSTANT) || (lastTableName != tableName)) {
+//        if (((utils.CURRENT_TIME - lastRunTime) > utils.COMPARISON_CONSTANT) || (lastTableName != tableName)) {
 
-            val db = dbHelper.writableDatabase
+        val db = dbHelper.writableDatabase
 
-            try {
-                val alterQuery = "ALTER TABLE $tableName ADD COLUMN $columnName TEXT DEFAULT NULL"
-                db.execSQL(alterQuery)
+        try {
+            val alterQuery = "ALTER TABLE $tableName ADD COLUMN $columnName TEXT DEFAULT NULL"
+            db.execSQL(alterQuery)
 
-                val contentValues = ContentValues()
-                contentValues.put(columnName, initialAttendanceState)
-                db.update(tableName, contentValues, null, null)
-            } catch (_: Exception) {
-                return -1
-            }
-            if (isModify) {
-                val editor: SharedPreferences.Editor = sharedPreferences.edit()
-                editor.putLong("LastRunTime", utils.CURRENT_TIME)
-                editor.putString("LastTableName", tableName)
-                editor.putString("LatestColumn", columnName)
-                editor.apply()
-            }
-
-            return 1
-        } else {
+            val contentValues = ContentValues()
+            contentValues.put(columnName, initialAttendanceState)
+            db.update(tableName, contentValues, null, null)
+        } catch (_: Exception) {
             return 0
         }
+        return 1
     }
 }
+
+//            if (isModify) {
+//                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+//                editor.putLong("LastRunTime", utils.CURRENT_TIME)
+//                editor.putString("LastTableName", tableName)
+//                editor.putString("LatestColumn", columnName)
+//                editor.apply()
+//            }
+//    }
+//    else {
+//            return 0
+//        }
+//    }
+//}
