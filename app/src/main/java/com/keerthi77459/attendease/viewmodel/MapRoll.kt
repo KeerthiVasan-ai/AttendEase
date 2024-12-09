@@ -42,7 +42,9 @@ class MapRoll(context: Context) {
         } else {
             while (cursor.moveToNext()) {
                 val tableName =
-                    cursor.getString(1) + "_" + cursor.getString(2) + "_" + cursor.getString(3) + "_" + cursor.getString(4)
+                    cursor.getString(1) + "_" + cursor.getString(2) + "_" + cursor.getString(3) + "_" + cursor.getString(
+                        4
+                    )
                 val rollQuery = "SELECT rollNo FROM $tableName WHERE mode = 'R'"
                 val lateralQuery = "SELECT rollNo FROM $tableName WHERE mode = 'LE'"
 
@@ -59,8 +61,8 @@ class MapRoll(context: Context) {
 
 
                 classNames.add(
-                    cursor.getString(1).toString() + "-" + cursor.getString(2)
-                        .toString() + "-" + cursor.getString(3).toString()
+                    cursor.getString(1).toString() + "-" + cursor.getString(2).toString() +
+                            "-" + cursor.getString(3).toString() + "-" + cursor.getString(4).toString()
                 )
             }
 

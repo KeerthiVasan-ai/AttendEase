@@ -1,6 +1,9 @@
 package com.keerthi77459.attendease.utils
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Resources
+import android.database.sqlite.SQLiteDatabase
 import com.keerthi77459.attendease.R
 import com.keerthi77459.attendease.viewmodel.MapDateAndTime
 import java.time.LocalDateTime
@@ -37,6 +40,13 @@ open class Utils {
             "You are editing previous response \n" +
             "CLICK OK TO PROCEED"
 
+    var VERSION_MISMATCH = "OOPS :( \n" +
+            "It's seems like you are on the Oldest Version of App \n" +
+            "Get the Recent Release"
+
+    var MAINTENANCE = "APP IS UNDER MAINTENANCE \n" +
+            "Sorry :( For the Inconvenience Caused"
+
 
     fun getAttendanceStatus(resources: Resources, attendanceType: String): Pair<String?, String?> {
         var initialAttendanceState: String? = null
@@ -62,8 +72,28 @@ open class Utils {
         }_${time.split(":")[0]}_${time.split(":")[1]}_00"
     }
 
-    fun insertToCloud() {
+    fun getDepartmentName(db: SQLiteDatabase, tableName: String): String {
+        val query = """
+            SELECT department FROM $TABLE_CLASS_DETAIL 
+            WHERE 
+            degree = '${tableName.split("_")[0]}' AND 
+            class = '${tableName.split("_")[1]}' AND 
+            year = '${tableName.split("_")[2]}' AND 
+            class_type = '${tableName.split("_")[3]}'
+            """.trimIndent()
 
+        val cursor = db.rawQuery(query, null)
+        cursor.moveToFirst()
+        val departmentName = cursor.getString(0)
+        cursor.close()
+        return departmentName
+    }
+
+    fun getInstitutionId(context: Context): String? {
+        val sharedPreferences =
+            context.getSharedPreferences("OnBoardingActivity", Context.MODE_PRIVATE)
+        val institutionId = sharedPreferences.getString("institutionId", null)
+        return institutionId
     }
 }
 
