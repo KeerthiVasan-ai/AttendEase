@@ -1,11 +1,15 @@
 package com.keerthi77459.attendease.ui
 
+import android.annotation.SuppressLint
 import android.content.*
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -29,17 +33,21 @@ class StudentDetail : AppCompatActivity() {
     private lateinit var dbHelper: DbHelper
     private lateinit var recycler2: RecyclerView
     private lateinit var studentDetailAdapter: StudentDetailAdapter
+    private lateinit var timeSlot: AutoCompleteTextView
     private lateinit var absentButton: Button
     private lateinit var switchMaterial: SwitchMaterial
     private lateinit var tableName: String
-    private var attendanceInitialMode: String = Utils().ATTENDANCE_PRESENT   //1
-    private var attendanceUpdatedMode: String = Utils().ATTENDANCE_ABSENT  //0
+    private lateinit var columnName: String
+    private var timeText: String? = null
+    private var initialAttendanceState: String = Utils().ATTENDANCE_PRESENT   //1
+    private var actualAttendanceState: String = Utils().ATTENDANCE_ABSENT  //0
     private lateinit var absentNumber: ArrayList<String>
     private lateinit var builder: AlertDialog.Builder
     private lateinit var v: View
     private lateinit var dialog: AlertDialog
 
 
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_student_detail)
@@ -57,13 +65,43 @@ class StudentDetail : AppCompatActivity() {
 
         absentNumber = ArrayList()
         absentButton = findViewById(R.id.absent)
+        absentButton.isEnabled = false
+        timeSlot = findViewById(R.id.timeSlotName)
 
         sharedPreferences = this.getSharedPreferences("dataPassing", Context.MODE_PRIVATE)
         val outDegreeName: String = sharedPreferences.getString("outDegreeName", null)!!
         val outClassName: String = sharedPreferences.getString("outClassName", null)!!
         val outYearName: String = sharedPreferences.getString("outYearName", null)!!
+        val classType: String = sharedPreferences.getString("classType", null)!!
 
-        tableName = outDegreeName + "_" + outClassName + "_" + outYearName
+        tableName = outDegreeName + "_" + outClassName + "_" + outYearName + "_" + classType
+
+        val theorySlotAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            R.layout.drop_down_text,
+            resources.getStringArray(R.array.theoryClassSlots)
+        )
+
+        val labSlotAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            R.layout.drop_down_text,
+            resources.getStringArray(R.array.labClassSlots)
+        )
+
+        if (classType == resources.getStringArray(R.array.class_type)[0]) {
+            timeSlot.setAdapter(theorySlotAdapter)
+        } else if (classType == resources.getStringArray(R.array.class_type)[1]) {
+            timeSlot.setAdapter(labSlotAdapter)
+        }
+
+        timeSlot.onItemClickListener = OnItemClickListener { _, _, _, _ ->
+            switchMaterial.isEnabled = true
+            timeText = timeSlot.text.toString()
+
+            columnName = utils.getColumnName(time = timeText!!)
+
+            updateCheckboxesBasedOnHour(columnName, actualAttendanceState)
+        }
 
         val isFetched = studentData.getStudentDetails(tableName)
         if (isFetched == 1) {
@@ -78,51 +116,64 @@ class StudentDetail : AppCompatActivity() {
                 )
             recycler2.adapter = studentDetailAdapter
             recycler2.layoutManager = LinearLayoutManager(this)
+            disableCheckboxes()
 
-            absentButton.setOnClickListener {
-
-                val db: SQLiteDatabase = dbHelper.writableDatabase
-
-                sharedPreferences = this.getSharedPreferences("DoOnce", Context.MODE_PRIVATE)
-                val lastRunTime: Long = sharedPreferences.getLong("LastRunTime", -1)
-                val lastTableName: String = sharedPreferences.getString("LastTableName", "class")!!
-
-                val isInitiated = logic.attendanceLogic(
-                    sharedPreferences,
-                    lastRunTime,
-                    lastTableName,
-                    tableName,
-                    attendanceInitialMode,
-                    utils.COLUMN_NAME,
-                    true
-                )
-                absentNumber = studentDetailAdapter.attendedRoll
-                println(absentNumber)
-
-                if (isInitiated == 1) {
-
-                    for (absent in absentNumber) {
-                        val contentValues1 = ContentValues()
-                        contentValues1.put(utils.COLUMN_NAME, attendanceUpdatedMode)
-                        db.update(
-                            tableName, contentValues1,
-                            "rollNo=?",
-                            arrayOf(absent)
-                        )
-                    }
-                    println(absentNumber)
-                    Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
-                        .show()
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-
-                } else {
-                    displayDialog(db, Utils().ATTENDANCE_UPDATE_WARNING)
-                }
-            }
         } else {
             Toast.makeText(this, "No Students", Toast.LENGTH_LONG).show()
+            absentButton.isEnabled = false
+        }
+
+        absentButton.setOnClickListener {
+
+            val db: SQLiteDatabase = dbHelper.writableDatabase
+
+            val isInitiated = logic.attendanceLogic(
+                tableName,
+                initialAttendanceState,
+                columnName,
+            )
+
+            absentNumber = studentDetailAdapter.attendedRoll
+
+            if (isInitiated == 1) {
+
+                for (absent in absentNumber) {
+                    val contentValues1 = ContentValues()
+                    contentValues1.put(columnName, actualAttendanceState)
+                    db.update(
+                        tableName, contentValues1,
+                        "rollNo=?",
+                        arrayOf(absent)
+                    )
+                }
+
+                println(absentNumber)
+                Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
+                    .show()
+
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+
+            } else {
+                displayDialog(db, Utils().ATTENDANCE_UPDATE_WARNING, columnName)
+            }
+        }
+    }
+
+    private fun disableCheckboxes() {
+        for (i in 0 until studentDetailAdapter.itemCount) {
+            val holder =
+                recycler2.findViewHolderForAdapterPosition(i) as? StudentDetailAdapter.StudentDetailViewHolder
+            holder?.isAttended?.isEnabled = false
+        }
+    }
+
+    private fun enableCheckboxes() {
+        for (i in 0 until studentDetailAdapter.itemCount) {
+            val holder =
+                recycler2.findViewHolderForAdapterPosition(i) as? StudentDetailAdapter.StudentDetailViewHolder
+            holder?.isAttended?.isEnabled = true
         }
     }
 
@@ -132,39 +183,45 @@ class StudentDetail : AppCompatActivity() {
         itemSwitch?.setActionView(R.layout.toggle_layout)
 
         switchMaterial = menu?.findItem(R.id.toggle)?.actionView!!.findViewById(R.id.toogleRoot)
+        switchMaterial.isEnabled = false
 
         switchMaterial.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                attendanceInitialMode = Utils().ATTENDANCE_ABSENT
-                attendanceUpdatedMode = Utils().ATTENDANCE_PRESENT
-                Toast.makeText(this, "You are going to select Present Students", Toast.LENGTH_LONG)
+                initialAttendanceState = Utils().ATTENDANCE_ABSENT
+                actualAttendanceState = Utils().ATTENDANCE_PRESENT
+
+                updateCheckboxesBasedOnHour(columnName, actualAttendanceState)
+
+                Toast.makeText(this, "You are going to select Present Students", Toast.LENGTH_SHORT)
                     .show()
+            } else {
+                initialAttendanceState = Utils().ATTENDANCE_PRESENT
+                actualAttendanceState = Utils().ATTENDANCE_ABSENT
+                updateCheckboxesBasedOnHour(columnName, actualAttendanceState)
             }
         }
         return true
     }
 
-    private fun displayDialog(db: SQLiteDatabase, message: String) {
+    private fun displayDialog(db: SQLiteDatabase, message: String, columnName: String) {
 
         val displayView: TextView = v.findViewById(R.id.alertbox)
         displayView.text = message
         builder.setView(v)
         builder.setTitle("WARNING")
             .setPositiveButton("I ,Understood") { _, _ ->
-                val latestColumnName: String = sharedPreferences.getString("LatestColumn", null)!!
-                absentNumber = studentDetailAdapter.attendedRoll
 
                 for (absent in absentNumber) {
                     val contentValues1 = ContentValues()
-                    contentValues1.put(latestColumnName, attendanceUpdatedMode)
+                    contentValues1.put(columnName, actualAttendanceState)
                     db.update(
                         tableName, contentValues1,
                         "rollNo=?",
                         arrayOf(absent)
                     )
                 }
-                println(absentNumber)
-                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_LONG).show()
+
+                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
@@ -179,4 +236,34 @@ class StudentDetail : AppCompatActivity() {
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
     }
+
+    private fun updateCheckboxesBasedOnHour(columnName: String, actualAttendanceState: String) {
+        val db = dbHelper.readableDatabase
+        val attendanceMap = mutableMapOf<String, Boolean>()
+
+        try {
+            val queryCursor = db.rawQuery("SELECT rollNo, $columnName FROM $tableName", null)
+
+            while (queryCursor.moveToNext()) {
+                val rollNo = queryCursor.getString(0)
+                val attendanceState = queryCursor.getString(1)
+                attendanceMap[rollNo] = attendanceState == actualAttendanceState
+            }
+            queryCursor.close()
+        } catch (e: Exception) {
+            enableCheckboxes()
+            absentButton.isEnabled = true
+        }
+
+        val attendedRollList = mutableListOf<String>()
+        for (rollNo in attendanceMap.keys) {
+            if (attendanceMap[rollNo] == true) {
+                attendedRollList.add(rollNo)
+            }
+        }
+        studentDetailAdapter.updateAttendance(attendedRollList)
+
+        absentButton.isEnabled = true
+    }
+
 }
