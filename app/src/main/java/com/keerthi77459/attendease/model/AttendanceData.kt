@@ -4,5 +4,5 @@ import java.io.Serializable
 
 data class AttendanceData(
     val columnName: String,
-    val trueValues: List<String>
+    val attendanceDataBasedOnGroup: Map<String, List<String>>
 ) : Serializable
