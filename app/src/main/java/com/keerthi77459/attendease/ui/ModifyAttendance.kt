@@ -1,11 +1,13 @@
 package com.keerthi77459.attendease.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
@@ -25,7 +27,6 @@ import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.model.ClassData
 import com.keerthi77459.attendease.utils.Utils
 import com.keerthi77459.attendease.viewmodel.Logic
-import com.keerthi77459.attendease.viewmodel.MapDateAndTime
 import com.keerthi77459.attendease.viewmodel.QuickAttendanceLogic
 
 class ModifyAttendance : AppCompatActivity() {
@@ -58,9 +59,13 @@ class ModifyAttendance : AppCompatActivity() {
     private lateinit var v: View
     private lateinit var dialog: AlertDialog
 
+    @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_modify_attendance)
+
+        builder = AlertDialog.Builder(this)
+        v = LayoutInflater.from(this).inflate(R.layout.fragement_alertbox, null)
 
         date = findViewById(R.id.dateField)
         time = findViewById(R.id.timeField)
@@ -165,26 +170,14 @@ class ModifyAttendance : AppCompatActivity() {
 
             if (isValid) {
 
-                val hour = utils.returnTimeHour(timeValue.split(":")[0])
-                Log.d("HOUR MODIFICATION", hour)
-
-                val columnName =
-                    "_${dateValue.split(" ")[0]}_${MapDateAndTime().timeDate[dateValue.split(" ")[1]]}_${
-                        dateValue.split(" ")[2]
-                    }_${hour}_${timeValue.split(":")[1]}_00"
-
+                val columnName = utils.getColumnName(dateValue, timeValue)
                 Log.d("Modify Attendance Column Name", columnName)
 
                 val isInitiated = logic.attendanceLogic(
-                    sharedPreferences,
-                    -1,
-                    "",
                     tableName,
                     attendanceStatus.first.toString(),
                     columnName,
-                    false
                 )
-                println(isInitiated)
 
                 val db = dbHelper.writableDatabase
 
@@ -201,20 +194,19 @@ class ModifyAttendance : AppCompatActivity() {
                         lateralRollNoText,
                         attendanceStatus.second.toString()
                     )
-                } else if (isInitiated == -1) {
-                    qaLogic.quickAttendance(
+                } else {
+                    displayDialog(
                         db,
                         utils,
                         tableName,
-                        rollNoText,
-                        columnName,
-                        lateralRollNoText,
-                        attendanceStatus.second.toString()
+                        utils.ATTENDANCE_UPDATE_WARNING,
+                        attendanceStatus.second.toString(),
+                        columnName
                     )
                 }
             }
 
-            Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
+            Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_SHORT)
                 .show()
             val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -252,7 +244,8 @@ class ModifyAttendance : AppCompatActivity() {
         utils: Utils,
         tableName: String,
         message: String,
-        actualAttendanceState: String
+        actualAttendanceState: String,
+        columnName: String
     ) {
 
         val displayView: TextView = v.findViewById(R.id.alertbox)
@@ -260,19 +253,18 @@ class ModifyAttendance : AppCompatActivity() {
         builder.setView(v)
         builder.setTitle("WARNING")
             .setPositiveButton("I, Understood") { _, _ ->
-                val latestColumnName: String = sharedPreferences.getString("LatestColumn", null)!!
 
                 qaLogic.quickAttendance(
                     db,
                     utils,
                     tableName,
                     rollNoText,
-                    latestColumnName,
+                    columnName,
                     lateralRollNoText,
                     actualAttendanceState
                 )
 
-                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
