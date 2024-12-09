@@ -93,19 +93,25 @@ public class AddClass extends AppCompatActivity {
 
         departmentName.setOnItemClickListener((adapterView, view, i, l) -> {
             departmentText = departmentName.getText().toString();
-            fetchClassNames(departmentText, institutionId);
+            classTypeName.setText(null);
+            className.setText(null);
+            classStrength.setText(null);
+        });
+
+        classTypeName.setOnItemClickListener((adapterView, view, i, L) -> {
+            classTypeText = classTypeName.getText().toString();
+            fetchClassNames(departmentText, institutionId, classTypeText);
             className.setText(null);
             classStrength.setText(null);
         });
 
         className.setOnItemClickListener((adapterView, view, i, l) -> {
-            fetchClassStrength(institutionId, departmentText, className.getText().toString());
+            fetchClassStrength(institutionId, departmentText, classTypeText, className.getText().toString());
             degreeText = className.getText().toString().split("-")[0];
             classText = className.getText().toString().split("-")[1];
             yearText = className.getText().toString().split("-")[2];
+            classStrength.setText(null);
         });
-
-        classTypeName.setOnItemClickListener((adapterView, view, i, L) -> classTypeText = classTypeName.getText().toString());
 
         alert = alertDialogBox.displayDialog(utils.getADD_CLASS_MESSAGE());
         alert.show();
@@ -132,7 +138,7 @@ public class AddClass extends AppCompatActivity {
             classStrengthText = Objects.requireNonNull(classStrength.getText()).toString();
 
             boolean valid = validate(departmentText, degreeText, classText, yearText, classTypeText, classStrengthText);
-            String tableName = degreeText + "_" + classText + "_" + yearText;
+            String tableName = degreeText + "_" + classText + "_" + yearText + "_" + classTypeText;
 
             if (valid) {
                 extension = fileNameText.getText().toString().split("\\.")[1];
@@ -225,13 +231,13 @@ public class AddClass extends AppCompatActivity {
         db.close();
     }
 
-    private void fetchClassNames(String departmentName, String institutionId) {
-
+    private void fetchClassNames(String departmentName, String institutionId, String classType) {
+        Log.d("Class Type", classType);
         List<String> subCollectionIds = new ArrayList<>();
         if (Objects.equals(institutionId, "")) {
             Toast.makeText(this, "Some Problem With your Institution", Toast.LENGTH_LONG).show();
         } else {
-            db.collection(institutionId).document(departmentName).collection("classes").get().addOnCompleteListener(task -> {
+            db.collection(institutionId).document(departmentName).collection(classType).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot subCollection : task.getResult()) {
                         subCollectionIds.add(subCollection.getId());
@@ -245,18 +251,28 @@ public class AddClass extends AppCompatActivity {
         }
     }
 
-    private void fetchClassStrength(String institutionId, String departmentName, String className) {
-        db.collection(institutionId).document(departmentName).collection("classes")
-                .document(className).collection("info").document("details")
-                .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
+    private void fetchClassStrength(String institutionId, String departmentName, String classType, String className) {
+        db.collection(institutionId).document(departmentName).collection(classType).document(className)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
                         Map<String, Object> data = task.getResult().getData();
                         if (data != null) {
                             String strength = (String) data.get("strength");
-                            classStrength.setText(strength);
+                            if (strength != null) {
+                                classStrength.setText(strength);
+                                Log.d("Firestore", "Strength: " + strength);
+                            } else {
+                                Log.w("Firestore", "Strength field is missing in the document.");
+                            }
+                        } else {
+                            Log.w("Firestore", "No data found in the document.");
                         }
+                    } else {
+                        Log.e("Firestore", "Error fetching document", task.getException());
                     }
-                });
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Failed to fetch document", e));
     }
 
 

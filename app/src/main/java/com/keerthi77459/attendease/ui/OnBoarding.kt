@@ -36,17 +36,17 @@ class OnBoarding : AppCompatActivity() {
             val valid = validate(userNameText, institutionIdText)
 
             if (valid) {
-                GetDepartmentNamesFromCloud().getDepartmentNames(
-                    institutionIdText,
+                GetDepartmentNamesFromCloud().getDepartmentNames(institutionIdText,
                     object : DataFetch {
                         override fun onSuccess(data: Array<String>) {
                             val editor: SharedPreferences.Editor = sharedPreferences.edit()
                             editor.putString("userName", userNameText)
                             editor.putString("institutionId", institutionIdText)
                             editor.putStringSet("departmentsName", data.toSet())
+                            editor.putBoolean("LoginStatus", true)
                             editor.apply()
 
-                            val intent = Intent(this@OnBoarding, LoginScreen::class.java)
+                            val intent = Intent(this@OnBoarding, MainActivity::class.java)
                             intent.flags =
                                 Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(intent)

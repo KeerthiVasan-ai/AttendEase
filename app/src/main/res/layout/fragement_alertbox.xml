@@ -7,11 +7,17 @@
         android:id="@+id/alertbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        android:text="Testing"
-        android:padding="10dp"
         android:fontFamily="@font/ebgaramondsemibold"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="@string/testing"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/alertbox"
+        android:contentDescription="@string/excel_view" />
 
 </RelativeLayout>

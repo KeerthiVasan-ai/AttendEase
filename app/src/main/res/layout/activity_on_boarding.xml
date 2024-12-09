@@ -29,24 +29,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppinsbold"
-                android:text="Welcome to AttendEase"
+                android:text="@string/welcome_to_attendease"
                 android:textColor="@color/black"
-                android:textSize="24sp"
+                android:textSize="24dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/innerLayout" />
+                app:layout_constraintTop_toTopOf="@id/innerLayout"
+                tools:ignore="SpUsage" />
 
             <TextView
                 android:id="@+id/text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppinsbold"
-                android:text="Get Started with your Insitution"
+                android:text="@string/get_started_with_your_insitution"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:textSize="14dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text1" />
+                app:layout_constraintTop_toBottomOf="@id/text1"
+                tools:ignore="SpUsage" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/userNameField"
@@ -54,14 +56,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Enter your Name (In Caps)"
+                android:hint="@string/enter_your_name_in_caps"
                 app:layout_constraintTop_toBottomOf="@id/text2">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/userName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/ebgaramondmedium" />
+                    android:fontFamily="@font/ebgaramondmedium"
+                    android:textAllCaps="true" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -70,16 +73,17 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_marginTop="16dp"
-                android:hint="Enter your Insitution ID"
+                android:hint="@string/enter_your_insitution_id"
                 app:layout_constraintTop_toBottomOf="@id/userNameField">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/insitutionID"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/ebgaramondmedium" />
+                    android:focusable="true"
+                    android:fontFamily="@font/ebgaramondmedium"
+                    android:inputType="number" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/ebgaramondsemibold"
-                android:text="Let's Go !!"
+                android:text="@string/let_s_go"
                 app:cornerRadius="4dp"
                 app:layout_constraintTop_toBottomOf="@id/insitutionIDField" />
 

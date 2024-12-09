@@ -24,7 +24,7 @@
         android:theme="@style/Theme.AttendEase"
         tools:targetApi="31">
         <activity
-            android:name=".ui.LoginScreen"
+            android:name=".ui.WarningScreen"
             android:exported="false" />
         <activity
             android:name=".ui.OnBoarding"

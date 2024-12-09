@@ -1,5 +1,6 @@
 package com.keerthi77459.attendease.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,17 +21,18 @@ import com.keerthi77459.attendease.utils.Utils;
 
 import java.util.ArrayList;
 
-public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHolder> {
+public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassAdapter.ManageClassViewHolder> {
 
     Context context;
-    ArrayList<String> degreeName, className, yearName;
+    ArrayList<String> departmentName, allClass, classType, classStrength;
 
-    public ManageClassAdapter(Context context, ArrayList<String> degreeName, ArrayList<String> className, ArrayList<String> yearName) {
+    public ManageClassAdapter(Context context, ArrayList<String> departmentName, ArrayList<String> allClass, ArrayList<String> classType, ArrayList<String> classStrength) {
 
         this.context = context;
-        this.degreeName = degreeName;
-        this.className = className;
-        this.yearName = yearName;
+        this.departmentName = departmentName;
+        this.allClass = allClass;
+        this.classType = classType;
+        this.classStrength = classStrength;
     }
 
     @NonNull
@@ -40,62 +42,70 @@ public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassViewHold
         return new ManageClassViewHolder(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ManageClassViewHolder holder, int position) {
-        holder.outDegreeName.setText(String.valueOf(degreeName.get(position)));
-        holder.outClassName.setText(String.valueOf(className.get(position)));
-        holder.outYearName.setText("Semester:" + String.valueOf(yearName.get(position)));
+        holder.outDepartmentName.setText(String.valueOf(departmentName.get(position)));
+        holder.outClassName.setText(String.valueOf(allClass.get(position)));
+        holder.outClassStrength.setText("Class Strength:" + classStrength.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return className.size();
+        return allClass.size();
     }
+
+    static class ManageClassViewHolder extends RecyclerView.ViewHolder {
+
+        TextView outDepartmentName, outClassName, outClassStrength;
+        Utils utils = new Utils();
+        ImageButton delete;
+
+
+        public ManageClassViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            delete = itemView.findViewById(R.id.deleteClass);
+            outDepartmentName = itemView.findViewById(R.id.outDegreeName);
+            outClassName = itemView.findViewById(R.id.outClassName);
+            outClassStrength = itemView.findViewById(R.id.outYearName);
+
+            delete.setVisibility(View.VISIBLE);
+
+            delete.setOnClickListener(view -> {
+
+                String outDegreeText = outDepartmentName.getText().toString();
+                String outClassText = outClassName.getText().toString();
+
+                String degreeText = outClassText.split("-")[0];
+                String classText = outClassText.split("-")[1];
+                String yearText = outClassText.split("-")[2];
+                String classType = outClassText.split("-")[3];
+
+                String tableName = degreeText + "_" + classText + "_" + yearText + "_" + classType;
+                System.out.println(tableName);
+
+                DbHelper dbHelper = new DbHelper(itemView.getContext());
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                String whereClause = "degree = ? AND class = ? AND year = ? AND class_type = ?";
+                String[] whereArgs = {degreeText, classText, yearText, classType};
+
+                String query = "DROP TABLE " + tableName;
+                System.out.println(query);
+                db.execSQL(query);
+                db.delete(utils.getTABLE_CLASS_DETAIL(), whereClause, whereArgs);
+                db.close();
+
+                Toast.makeText(itemView.getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(itemView.getContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                itemView.getContext().startActivity(intent);
+
+            });
+        }
+    }
+
 }
 
-class ManageClassViewHolder extends RecyclerView.ViewHolder {
-
-    TextView outDegreeName, outClassName, outYearName;
-    Utils utils = new Utils();
-    ImageButton delete;
-
-    public ManageClassViewHolder(@NonNull View itemView) {
-        super(itemView);
-
-        delete = itemView.findViewById(R.id.deleteClass);
-        outDegreeName = itemView.findViewById(R.id.outDegreeName);
-        outClassName = itemView.findViewById(R.id.outClassName);
-        outYearName = itemView.findViewById(R.id.outYearName);
-
-        delete.setVisibility(View.VISIBLE);
-
-        delete.setOnClickListener(view -> {
-
-            String outDegreeText = outDegreeName.getText().toString();
-            String outClassText = outClassName.getText().toString();
-            String outYearText = outYearName.getText().toString().split(":")[1];
-
-            String tableName = outDegreeText + "_" + outClassText + "_" + outYearText;
-            System.out.println(tableName);
-
-            DbHelper dbHelper = new DbHelper(itemView.getContext());
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            String whereClause = "degree = ? AND class = ? AND year = ?";
-            String[] whereArgs = {outDegreeText, outClassText, outYearText};
-
-            String query = "DROP TABLE " + tableName;
-            System.out.println(query);
-            db.execSQL(query);
-            db.delete(utils.getTABLE_CLASS_DETAIL(), whereClause, whereArgs);
-            db.close();
-
-            Toast.makeText(itemView.getContext(), "Successfully Deleted", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(itemView.getContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            itemView.getContext().startActivity(intent);
-
-        });
-    }
-}

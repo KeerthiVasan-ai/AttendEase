@@ -1,5 +1,6 @@
 package com.keerthi77459.attendease.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.keerthi77459.attendease.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailViewHolder> {
+public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailAdapter.StudentDetailViewHolder> {
 
     Context context;
     ArrayList<String> rollNo;
@@ -32,7 +34,7 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
     @NonNull
     @Override
     public StudentDetailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.student_layout,parent,false);
+        View v = LayoutInflater.from(context).inflate(R.layout.student_layout, parent, false);
         return new StudentDetailViewHolder(v);
     }
 
@@ -47,10 +49,10 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
         holder.isAttended.setOnCheckedChangeListener(null);
         holder.isAttended.setChecked(attendedRoll.contains(value));
 
-        holder.isAttended.setOnCheckedChangeListener((b,isChecked)->{
-            if(isChecked){
+        holder.isAttended.setOnCheckedChangeListener((b, isChecked) -> {
+            if (isChecked) {
                 attendedRoll.add(value);
-            } else{
+            } else {
                 attendedRoll.remove(value);
             }
             notifyItemChanged(position);
@@ -66,19 +68,27 @@ public class StudentDetailAdapter extends RecyclerView.Adapter<StudentDetailView
     public ArrayList<String> getAttendedRoll() {
         return attendedRoll;
     }
-}
 
-class StudentDetailViewHolder extends RecyclerView.ViewHolder {
-
-    TextView outStudentName,outRollName;
-    CheckBox isAttended;
-
-    public StudentDetailViewHolder(@NonNull View itemView) {
-
-        super(itemView);
-
-        outStudentName = itemView.findViewById(R.id.outStudentName);
-        outRollName = itemView.findViewById(R.id.outRollName);
-        isAttended = itemView.findViewById(R.id.isAttended);
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateAttendance(List<String> attendedRollList) {
+        attendedRoll.clear();
+        attendedRoll.addAll(attendedRollList);
+        notifyDataSetChanged();
     }
+
+    public static class StudentDetailViewHolder extends RecyclerView.ViewHolder {
+
+        TextView outStudentName, outRollName;
+        public CheckBox isAttended;
+
+        public StudentDetailViewHolder(@NonNull View itemView) {
+
+            super(itemView);
+
+            outStudentName = itemView.findViewById(R.id.outStudentName);
+            outRollName = itemView.findViewById(R.id.outRollName);
+            isAttended = itemView.findViewById(R.id.isAttended);
+        }
+    }
+
 }

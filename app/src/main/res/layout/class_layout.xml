@@ -1,56 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="8dp"
     app:cardCornerRadius="6dp"
-    app:cardUseCompatPadding="true"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    app:cardElevation="8dp"
+    app:cardUseCompatPadding="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:padding="12dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/outDegreeName"
             android:layout_width="wrap_content"
-            android:fontFamily="@font/ebgaramondbold"
-            android:textSize="16dp"
             android:layout_height="wrap_content"
-            android:text="Degree Here"
+            android:fontFamily="@font/ebgaramondbold"
+            android:gravity="top"
+            android:text="@string/degree_here"
             android:textColor="@color/black"
-            android:gravity="top"/>
+            android:textSize="16dp"
+            tools:ignore="SpUsage" />
 
         <TextView
             android:id="@+id/outClassName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/ebgaramondbold"
-            android:textSize="16dp"
-            android:text="Class Here"
-            android:textColor="@color/black"
             android:layout_below="@id/outDegreeName"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/ebgaramondbold"
+            android:text="@string/class_here"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            tools:ignore="SpUsage" />
 
         <TextView
             android:id="@+id/outYearName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/ebgaramondbold"
-            android:textSize="16dp"
-            android:layout_marginTop="4dp"
             android:layout_below="@id/outClassName"
-            android:text="Semester Here"
-            android:textColor="@color/black" />
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/ebgaramondbold"
+            android:text="@string/semester_here"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            tools:ignore="SpUsage" />
 
         <ImageButton
             android:id="@+id/deleteClass"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_baseline_delete_24"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_baseline_delete_24"
+            android:contentDescription="@string/delete_button" />
 
     </RelativeLayout>
 

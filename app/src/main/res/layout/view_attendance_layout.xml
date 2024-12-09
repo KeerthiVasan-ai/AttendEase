@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="6dp"
@@ -20,7 +21,8 @@
             android:gravity="top"
             android:text="@string/date"
             android:textColor="@color/black"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            tools:ignore="SpUsage" />
 
         <TextView
             android:id="@+id/attendanceData"
@@ -29,7 +31,7 @@
             android:layout_below="@id/dateAndTime"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/ebgaramondbold"
-            android:text="ABSENTESS DATA GOES HERE"
+            android:text="@string/absentess_data_goes_here"
             android:textColor="@color/black"
             android:textSize="16dp" />
 
@@ -39,7 +41,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/ic_baseline_delete_24" />
+            android:background="@drawable/ic_baseline_delete_24"
+            android:contentDescription="@string/delete_button" />
 
     </RelativeLayout>
 

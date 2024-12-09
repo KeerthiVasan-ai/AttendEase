@@ -23,6 +23,7 @@
     <string-array name="class_type">
         <item>Theory</item>
         <item>Lab</item>
+        <item>Project</item>
     </string-array>
 
     <string-array name="attendance_type">
@@ -31,33 +32,33 @@
     </string-array>
 
     <string-array name="month">
-        <item>01</item>
-        <item>02</item>
-        <item>03</item>
-        <item>04</item>
-        <item>05</item>
-        <item>06</item>
         <item>07</item>
         <item>08</item>
         <item>09</item>
         <item>10</item>
         <item>11</item>
         <item>12</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
     </string-array>
 
     <string-array name="monthName">
-        <item>"Jan"</item>
-        <item>"Feb"</item>
-        <item>"Mar"</item>
-        <item>"Apr"</item>
-        <item>"May"</item>
-        <item>"June"</item>
         <item>"July"</item>
         <item>"August"</item>
         <item>"Sept"</item>
         <item>"Oct"</item>
         <item>"Nov"</item>
         <item>"Dec"</item>
+        <item>"Jan"</item>
+        <item>"Feb"</item>
+        <item>"Mar"</item>
+        <item>"Apr"</item>
+        <item>"May"</item>
+        <item>"June"</item>
     </string-array>
 
     <string-array name="theoryClassSlots">
@@ -66,7 +67,7 @@
         <item>10:00</item>
         <item>10:55</item>
         <item>11:40</item>
-        <item>12:23</item>
+        <item>12:25</item>
         <item>01:30</item>
         <item>02:15</item>
         <item>03:00</item>
@@ -124,5 +125,32 @@
     <string name="spend_few_minutes_to_fill_these_details">Spend Few Minutes to Fill these Details</string>
     <string name="hello_professor">Hello, Professor</string>
     <string name="finish_it_off">Finish It Off !!</string>
+    <string name="welcome_to_attendease">Welcome to AttendEase</string>
+    <string name="get_started_with_your_insitution">Get Started with your Insitution</string>
+    <string name="enter_your_name_in_caps">Enter your Name (In Caps)</string>
+    <string name="enter_your_insitution_id">Enter your Insitution ID</string>
+    <string name="let_s_go">Let\'s Go !!</string>
+    <string name="create_class">Create Class</string>
+    <string name="upload_excel_button">Upload Excel Button</string>
+    <string name="class_strength">Class Strength</string>
+    <string name="choose_department">Choose Department</string>
+    <string name="generate_report">Generate Report</string>
+    <string name="an_annamalai_university_product">An Annamalai University Product</string>
+    <string name="note_enter_the_comma_seperated_values">Note : Enter the Comma Seperated Values</string>
+    <string name="lateral_entry_number">Lateral Entry Number</string>
+    <string name="roll_number">Roll Number</string>
+    <string name="degree_here">Degree Here</string>
+    <string name="class_here">Class Here</string>
+    <string name="semester_here">Semester Here</string>
+    <string name="delete_button">Delete Button</string>
+    <string name="example">Example</string>
+    <string name="testing">Testing</string>
+    <string name="excel_view">Excel View</string>
+    <string name="an_easy_attendance_manager">An Easy Attendance Manager</string>
+    <string name="app_logo">App Logo</string>
+    <string name="_0000000000">0000000000</string>
+    <string name="student_name_here">Student Name Here</string>
+    <string name="absentess_data_goes_here">ABSENTESS DATA GOES HERE</string>
+    <string name="note_files_will_be_stored_at_n_local_storage_downloads_attendease">Note : Reports will be Stored at \n Local Storage/Downloads/AttendEase</string>
 
 </resources>

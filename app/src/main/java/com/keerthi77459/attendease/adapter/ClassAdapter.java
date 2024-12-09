@@ -18,7 +18,7 @@ import com.keerthi77459.attendease.ui.StudentDetail;
 
 import java.util.ArrayList;
 
-public class ClassAdapter extends RecyclerView.Adapter<ClassViewHolder> {
+public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHolder> {
 
     Context context;
     ArrayList<String> departmentName, allClass, classType, classStrength;
@@ -52,44 +52,45 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassViewHolder> {
 
         return allClass.size();
     }
-}
 
-class ClassViewHolder extends RecyclerView.ViewHolder {
+    static class ClassViewHolder extends RecyclerView.ViewHolder {
 
-    TextView outDepartmentName, outClassName, outClassStrength;
-    ImageButton delete;
-    SharedPreferences sharedPreferences;
+        TextView outDepartmentName, outClassName, outClassStrength;
+        ImageButton delete;
+        SharedPreferences sharedPreferences;
 
 
-    public ClassViewHolder(@NonNull View itemView) {
-        super(itemView);
+        public ClassViewHolder(@NonNull View itemView) {
+            super(itemView);
 
-        delete = itemView.findViewById(R.id.deleteClass);
-        outDepartmentName = itemView.findViewById(R.id.outDegreeName);
-        outClassName = itemView.findViewById(R.id.outClassName);
-        outClassStrength = itemView.findViewById(R.id.outYearName);
+            delete = itemView.findViewById(R.id.deleteClass);
+            outDepartmentName = itemView.findViewById(R.id.outDegreeName);
+            outClassName = itemView.findViewById(R.id.outClassName);
+            outClassStrength = itemView.findViewById(R.id.outYearName);
 
-        delete.setVisibility(View.INVISIBLE);
+            delete.setVisibility(View.INVISIBLE);
 
-        System.out.println(outClassName.getText().toString());
+            System.out.println(outClassName.getText().toString());
 
-        itemView.setOnClickListener(view -> {
-            sharedPreferences = itemView.getContext().getSharedPreferences("dataPassing", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            String degree = outClassName.getText().toString().split("-")[0];
-            String Class = outClassName.getText().toString().split("-")[1];
-            String year = outClassName.getText().toString().split("-")[2];
-            String classType = outClassName.getText().toString().split("-")[3];
-            String classStrength = outClassStrength.getText().toString().split(":")[1];
+            itemView.setOnClickListener(view -> {
+                sharedPreferences = itemView.getContext().getSharedPreferences("dataPassing", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                String degree = outClassName.getText().toString().split("-")[0];
+                String Class = outClassName.getText().toString().split("-")[1];
+                String year = outClassName.getText().toString().split("-")[2];
+                String classType = outClassName.getText().toString().split("-")[3];
+                String classStrength = outClassStrength.getText().toString().split(":")[1];
 
-            editor.putString("outDegreeName", degree);
-            editor.putString("outClassName", Class);
-            editor.putString("outYearName", year);
-            editor.putString("classStrength", classStrength);
+                editor.putString("outDegreeName", degree);
+                editor.putString("outClassName", Class);
+                editor.putString("outYearName", year);
+                editor.putString("classType", classType);
+                editor.putString("classStrength", classStrength);
 
-            editor.apply();
-            Intent intent = new Intent(itemView.getContext(), StudentDetail.class);
-            itemView.getContext().startActivity(intent);
-        });
+                editor.apply();
+                Intent intent = new Intent(itemView.getContext(), StudentDetail.class);
+                itemView.getContext().startActivity(intent);
+            });
+        }
     }
 }

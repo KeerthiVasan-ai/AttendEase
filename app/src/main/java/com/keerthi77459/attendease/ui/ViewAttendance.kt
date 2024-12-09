@@ -17,7 +17,7 @@ import com.keerthi77459.attendease.db.DbHelper
 import com.keerthi77459.attendease.model.AttendanceData
 import com.keerthi77459.attendease.model.ClassData
 import com.keerthi77459.attendease.utils.Utils
-import com.keerthi77459.attendease.viewmodel.FetchAttendanceData
+import com.keerthi77459.attendease.viewmodel.FetchAttendanceDataNew
 import com.keerthi77459.attendease.viewmodel.MapDateAndTime
 
 class ViewAttendance : AppCompatActivity() {
@@ -32,6 +32,7 @@ class ViewAttendance : AppCompatActivity() {
     private var vaDegreeText: String? = null
     private var vaClassText: String? = null
     private var vaYearText: String? = null
+    private var vaClassTypeText: String? = null
     private var vaAttendanceType: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +46,6 @@ class ViewAttendance : AppCompatActivity() {
 
         val utils = Utils()
         val dbHelper = DbHelper(this)
-        val fetchAttendanceData = FetchAttendanceData()
         val classData = ClassData(this)
         overallClassDetails = classData.mergedClassDetails()
 
@@ -63,6 +63,7 @@ class ViewAttendance : AppCompatActivity() {
             vaDegreeText = vaDegreeName.text.toString().split("-")[0]
             vaClassText = vaDegreeName.text.toString().split("-")[1]
             vaYearText = vaDegreeName.text.toString().split("-")[2]
+            vaClassTypeText = vaDegreeName.text.toString().split("-")[3]
         }
 
         vaAttendanceTypeName.onItemClickListener = OnItemClickListener { _, _, _, _ ->
@@ -70,10 +71,11 @@ class ViewAttendance : AppCompatActivity() {
         }
 
         val materialDateBuilder: MaterialDatePicker.Builder<Long> =
-            MaterialDatePicker.Builder.datePicker().setTitleText("SELECT A DATE")
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("SELECT A DATE")
                 .setCalendarConstraints(
                     CalendarConstraints.Builder()
-                        .setValidator(DateValidatorPointBackward.now()) // Restrict to past and current dates
+                        .setValidator(DateValidatorPointBackward.now())
                         .build()
                 )
 
@@ -109,7 +111,8 @@ class ViewAttendance : AppCompatActivity() {
                 val month = MapDateAndTime().timeDate[dateValue.split(" ")[1]]
                 val year = dateValue.split(" ")[2]
 
-                val tableName = vaDegreeText + "_" + vaClassText + "_" + vaYearText
+                val tableName =
+                    vaDegreeText + "_" + vaClassText + "_" + vaYearText + "_" + vaClassTypeText
 
                 val attendanceStatus = when (vaAttendanceType) {
                     resources.getStringArray(R.array.attendance_type)[0] -> utils.ATTENDANCE_ABSENT
@@ -119,14 +122,16 @@ class ViewAttendance : AppCompatActivity() {
                 println(dateValue)
                 println(tableName)
 
-                val viewAttendanceData = fetchAttendanceData.fetchTrueValues(
-                    db, tableName, date, month.toString(), year, attendanceStatus
-                )
+                val viewAttendanceData =
+                    FetchAttendanceDataNew().fetchTrueValuesGroupedByColumnAndMode(
+                        db, tableName, date, month.toString(), year, attendanceStatus
+                    )
+
 
                 println(viewAttendanceData)
 
                 val resultData =
-                    ArrayList(viewAttendanceData.map { AttendanceData(it.first, it.second) })
+                    ArrayList(viewAttendanceData.map { AttendanceData(it.key, it.value) })
                 val intent = Intent(this, ViewAttendanceList::class.java)
                 intent.putExtra("tableName", tableName)
                 intent.putExtra("attendanceType", vaAttendanceType)

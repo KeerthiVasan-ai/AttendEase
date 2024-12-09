@@ -64,7 +64,7 @@ class ClassData(context: Context) {
     ): Long {
         val db: SQLiteDatabase = dbHelper.writableDatabase
         val query =
-            "SELECT * FROM ${utils.TABLE_CLASS_DETAIL} WHERE degree = '$degreeText' AND class = '$classText' AND year = '$yearText'"
+            "SELECT * FROM ${utils.TABLE_CLASS_DETAIL} WHERE degree = '$degreeText' AND class = '$classText' AND year = '$yearText' AND class_type = '$classTypeText'"
         val cursor = db.rawQuery(query, null)
         println(cursor.count)
         return if (cursor.count != 0) {

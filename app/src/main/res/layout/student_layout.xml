@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="8dp"
-    app:cardCornerRadius="6dp"
     android:padding="16dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="8dp"
     app:cardUseCompatPadding="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:padding="12dp"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/outStudentName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
             android:fontFamily="@font/ebgaramondbold"
-            android:text="Student Name Here"
+            android:gravity="top"
+            android:text="@string/student_name_here"
             android:textColor="@color/black"
-            android:gravity="top"/>
+            android:textSize="16dp"
+            tools:ignore="SpUsage" />
 
         <TextView
             android:id="@+id/outRollName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:fontFamily="@font/ebgaramondbold"
-            android:text="0000000000"
-            android:textColor="@color/black"
             android:layout_below="@id/outStudentName"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/ebgaramondbold"
+            android:text="@string/_0000000000"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            tools:ignore="SpUsage" />
 
         <CheckBox
             android:id="@+id/isAttended"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="12dp"
             android:layout_marginTop="9dp"
-            />
+            android:layout_marginEnd="12dp" />
 
 
     </RelativeLayout>
