@@ -89,7 +89,7 @@ public class ManageClassAdapter extends RecyclerView.Adapter<ManageClassAdapter.
                 SQLiteDatabase db = dbHelper.getWritableDatabase();
 
                 String whereClause = "degree = ? AND class = ? AND year = ? AND class_type = ?";
-                String[] whereArgs = {outDegreeText, outClassText, yearText, classType};
+                String[] whereArgs = {degreeText, classText, yearText, classType};
 
                 String query = "DROP TABLE " + tableName;
                 System.out.println(query);
