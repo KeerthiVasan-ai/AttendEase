@@ -23,6 +23,7 @@
     <string-array name="class_type">
         <item>Theory</item>
         <item>Lab</item>
+        <item>Project</item>
     </string-array>
 
     <string-array name="attendance_type">
@@ -31,33 +32,33 @@
     </string-array>
 
     <string-array name="month">
-        <item>01</item>
-        <item>02</item>
-        <item>03</item>
-        <item>04</item>
-        <item>05</item>
-        <item>06</item>
         <item>07</item>
         <item>08</item>
         <item>09</item>
         <item>10</item>
         <item>11</item>
         <item>12</item>
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
     </string-array>
 
     <string-array name="monthName">
-        <item>"Jan"</item>
-        <item>"Feb"</item>
-        <item>"Mar"</item>
-        <item>"Apr"</item>
-        <item>"May"</item>
-        <item>"June"</item>
         <item>"July"</item>
         <item>"August"</item>
         <item>"Sept"</item>
         <item>"Oct"</item>
         <item>"Nov"</item>
         <item>"Dec"</item>
+        <item>"Jan"</item>
+        <item>"Feb"</item>
+        <item>"Mar"</item>
+        <item>"Apr"</item>
+        <item>"May"</item>
+        <item>"June"</item>
     </string-array>
 
     <string-array name="theoryClassSlots">
@@ -66,7 +67,7 @@
         <item>10:00</item>
         <item>10:55</item>
         <item>11:40</item>
-        <item>12:23</item>
+        <item>12:25</item>
         <item>01:30</item>
         <item>02:15</item>
         <item>03:00</item>
