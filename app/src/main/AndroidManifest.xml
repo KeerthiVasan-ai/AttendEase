@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
@@ -23,6 +23,12 @@
         android:testOnly="false"
         android:theme="@style/Theme.AttendEase"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.BackupScreen"
+            android:exported="false" />
+        <activity
+            android:name=".ui.AboutScreen"
+            android:exported="false" />
         <activity
             android:name=".ui.WarningScreen"
             android:exported="false" />
