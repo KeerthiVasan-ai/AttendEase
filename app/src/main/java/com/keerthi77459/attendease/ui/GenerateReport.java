@@ -119,15 +119,7 @@ public class GenerateReport extends AppCompatActivity {
             Row row = daySheet.createRow(rowIndex);
             for (int i = 0; i < columnNames.length; i++) {
                 Cell cell = row.createCell(i);
-//                if (i > 1) {
-//                    int cell_value = Integer.parseInt(cursor.getString(i)) * multiplicationConstant;
-//                    if (i == 2) {
-//                        Log.d("CHECKING", String.valueOf(cell_value));
-//                    }
-//                    cell.setCellValue(String.valueOf(cell_value));
-//                } else {
                 cell.setCellValue(cursor.getString(i));
-//                }
             }
             rowIndex++;
         }
@@ -161,7 +153,6 @@ public class GenerateReport extends AppCompatActivity {
         List<String> availableMonths = new ArrayList<>();
 
         for (String month : resourceMonths) {
-            Log.d("MONTH CHECK", month);
 
             String testQuery = "SELECT name FROM pragma_table_info('" + tableName + "') WHERE name LIKE '____" + month + "_%'";
             Cursor columnSelectionQuery = database.rawQuery(testQuery, null);
@@ -178,7 +169,11 @@ public class GenerateReport extends AppCompatActivity {
                 monthAttendanceQuery.append(" AS ").append(monthNames[Integer.parseInt(month) - 1]).append(", ");
             }
         }
-        monthAttendanceQuery.setLength(monthAttendanceQuery.length() - 2);
+        if (!availableMonths.isEmpty()) {
+            monthAttendanceQuery.setLength(monthAttendanceQuery.length() - 2);
+        } else {
+            monthAttendanceQuery.setLength(monthAttendanceQuery.length() - 1);
+        }
         monthAttendanceQuery.append(" FROM ").append(tableName).append(" GROUP BY rollNo");
 
         String monthWiseAttendanceQuery = monthAttendanceQuery.toString();
