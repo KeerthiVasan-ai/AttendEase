@@ -47,18 +47,18 @@
     </string-array>
 
     <string-array name="monthName">
-        <item>"July"</item>
-        <item>"August"</item>
-        <item>"Sept"</item>
-        <item>"Oct"</item>
-        <item>"Nov"</item>
-        <item>"Dec"</item>
         <item>"Jan"</item>
         <item>"Feb"</item>
         <item>"Mar"</item>
         <item>"Apr"</item>
         <item>"May"</item>
         <item>"June"</item>
+        <item>"July"</item>
+        <item>"August"</item>
+        <item>"Sept"</item>
+        <item>"Oct"</item>
+        <item>"Nov"</item>
+        <item>"Dec"</item>
     </string-array>
 
     <string-array name="theoryClassSlots">
@@ -126,9 +126,9 @@
     <string name="hello_professor">Hello, Professor</string>
     <string name="finish_it_off">Finish It Off !!</string>
     <string name="welcome_to_attendease">Welcome to AttendEase</string>
-    <string name="get_started_with_your_insitution">Get Started with your Insitution</string>
+    <string name="get_started_with_your_institution">Get Started with your Institution</string>
     <string name="enter_your_name_in_caps">Enter your Name (In Caps)</string>
-    <string name="enter_your_insitution_id">Enter your Insitution ID</string>
+    <string name="enter_your_institution_id">Enter your Institution ID</string>
     <string name="let_s_go">Let\'s Go !!</string>
     <string name="create_class">Create Class</string>
     <string name="upload_excel_button">Upload Excel Button</string>
@@ -136,7 +136,7 @@
     <string name="choose_department">Choose Department</string>
     <string name="generate_report">Generate Report</string>
     <string name="an_annamalai_university_product">An Annamalai University Product</string>
-    <string name="note_enter_the_comma_seperated_values">Note : Enter the Comma Seperated Values</string>
+    <string name="note_enter_the_comma_separated_values">Note : Enter the Comma Separated Values</string>
     <string name="lateral_entry_number">Lateral Entry Number</string>
     <string name="roll_number">Roll Number</string>
     <string name="degree_here">Degree Here</string>
@@ -150,7 +150,9 @@
     <string name="app_logo">App Logo</string>
     <string name="_0000000000">0000000000</string>
     <string name="student_name_here">Student Name Here</string>
-    <string name="absentess_data_goes_here">ABSENTESS DATA GOES HERE</string>
+    <string name="absentees_data_goes_here">ABSENTEES DATA GOES HERE</string>
     <string name="note_files_will_be_stored_at_n_local_storage_downloads_attendease">Note : Reports will be Stored at \n Local Storage/Downloads/AttendEase</string>
+    <string name="backup_database">Backup Database</string>
+    <string name="restore_database">Restore Database</string>
 
 </resources>

@@ -31,7 +31,7 @@
             android:layout_below="@id/dateAndTime"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/ebgaramondbold"
-            android:text="@string/absentess_data_goes_here"
+            android:text="@string/absentees_data_goes_here"
             android:textColor="@color/black"
             android:textSize="16dp" />
 

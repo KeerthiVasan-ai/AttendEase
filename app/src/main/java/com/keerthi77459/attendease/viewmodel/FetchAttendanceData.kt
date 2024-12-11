@@ -37,6 +37,7 @@ class FetchAttendanceDataNew {
                     do {
                         val mode = groupCursor.getString(0)
                         val rollNo = groupCursor.getString(1)
+                        println(rollNo)
                         val clippedRoll = rollNo.takeLast(3).replace("^0".toRegex(), "")
                         columnData.computeIfAbsent(mode) { mutableListOf() }.add(clippedRoll)
                     } while (groupCursor.moveToNext())
