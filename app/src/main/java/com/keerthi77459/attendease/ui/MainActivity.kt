@@ -85,6 +85,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.viewAttendance -> {
                 startActivity(Intent(this, ViewAttendance::class.java))
             }
+
+//            R.id.backupScree -> {
+//                startActivity(Intent(this, BackupScreen::class.java))
+//            }
         }
         return true
     }

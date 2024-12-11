@@ -10,17 +10,22 @@
 
     <item
         android:id="@+id/quickAttendance"
-        android:title="Quick Attendance" />
+        android:title="@string/quick_attendance" />
 
-    <item
-        android:id="@+id/generateReport"
-        android:title="Generate Report" />
 
     <item
         android:id="@+id/modifyAttendance"
-        android:title="Modify Attendance" />
+        android:title="@string/modify_attendance" />
 
     <item
         android:id="@+id/viewAttendance"
-        android:title="View Attendance" />
+        android:title="@string/view_attendance" />
+
+    <item
+        android:id="@+id/generateReport"
+        android:title="@string/generate_report" />
+
+<!--    <item-->
+<!--        android:id="@+id/backupScree"-->
+<!--        android:title="Backup Screen" />-->
 </menu>
