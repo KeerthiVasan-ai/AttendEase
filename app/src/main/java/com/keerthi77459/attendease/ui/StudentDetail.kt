@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -129,62 +130,50 @@ class StudentDetail : AppCompatActivity() {
 
             val db: SQLiteDatabase = dbHelper.writableDatabase
 
-            val isInitiated = logic.attendanceLogic(
-                tableName,
-                initialAttendanceState,
-                columnName,
-            )
-
             absentNumber = studentDetailAdapter.attendedRoll
 
-            if (isInitiated == 1) {
 
-                for (absent in absentNumber) {
-                    val contentValues1 = ContentValues()
-                    contentValues1.put(columnName, actualAttendanceState)
-                    db.update(
-                        tableName, contentValues1,
-                        "rollNo=?",
-                        arrayOf(absent)
-                    )
-                }
+            val totalStudents = studentData.rollNo.size
+            val absentees: Int
+            val presentees: Int
 
-                val institutionId = utils.getInstitutionId(this)
-                val departmentName = utils.getDepartmentName(db, tableName)
-                val cloudClassName = "$outDegreeName-$outClassName-$outYearName"
-
-                val cloudData =
-                    FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
-
-                AttendanceDataToCloud().insertAttendanceData(
-                    institutionId!!,
-                    departmentName,
-                    classType,
-                    cloudClassName,
-                    columnName,
-                    cloudData
-                )
-
-                println(absentNumber)
-                Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
-                    .show()
-
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
-
+            if (switchMaterial.isChecked) {
+                presentees = absentNumber.size
+                absentees = totalStudents - presentees
             } else {
-                displayDialog(
-                    db,
-                    Utils().ATTENDANCE_UPDATE_WARNING,
-                    columnName,
-                    utils,
-                    outDegreeName,
-                    outClassName,
-                    outYearName,
-                    classType
-                )
+                absentees = absentNumber.size
+                presentees = totalStudents - absentees
             }
+
+            val attendanceSummary = "Total Students: $totalStudents\n" +
+                    "Absentees: $absentees\n" +
+                    "Presentees: $presentees"
+
+            val displayView: TextView = v.findViewById(R.id.alertbox)
+            displayView.text = attendanceSummary
+            builder.setView(v)
+            builder.setTitle("WARNING")
+                .setPositiveButton("I ,Understood") { _, _ ->
+                    displayDialog(
+                        db,
+                        logic,
+                        columnName,
+                        utils,
+                        outDegreeName,
+                        outClassName,
+                        outYearName,
+                        classType
+                    )
+                }.setNegativeButton("CANCEL") { _, _ ->
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags =
+                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                }
+            dialog = builder.create()
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.show()
+
         }
     }
 
@@ -232,7 +221,7 @@ class StudentDetail : AppCompatActivity() {
 
     private fun displayDialog(
         db: SQLiteDatabase,
-        message: String,
+        logic: Logic,
         columnName: String,
         utils: Utils,
         outDegreeName: String,
@@ -240,53 +229,85 @@ class StudentDetail : AppCompatActivity() {
         outYearName: String,
         classType: String
     ) {
+        val isInitiated = logic.attendanceLogic(
+            tableName,
+            initialAttendanceState,
+            columnName,
+        )
+        if (isInitiated == 1) {
 
-        val displayView: TextView = v.findViewById(R.id.alertbox)
-        displayView.text = message
-        builder.setView(v)
-        builder.setTitle("WARNING")
-            .setPositiveButton("I ,Understood") { _, _ ->
+            for (absent in absentNumber) {
+                val contentValues1 = ContentValues()
+                contentValues1.put(columnName, actualAttendanceState)
+                db.update(
+                    tableName, contentValues1,
+                    "rollNo=?",
+                    arrayOf(absent)
+                )
+            }
 
-                for (absent in absentNumber) {
-                    val contentValues1 = ContentValues()
-                    contentValues1.put(columnName, actualAttendanceState)
-                    db.update(
-                        tableName, contentValues1,
-                        "rollNo=?",
-                        arrayOf(absent)
-                    )
-                }
+            val institutionId = utils.getInstitutionId(this)
+            val departmentName = utils.getDepartmentName(db, tableName)
+            val cloudClassName = "$outDegreeName-$outClassName-$outYearName"
 
-                val institutionId = utils.getInstitutionId(this)
-                val departmentName = utils.getDepartmentName(db, tableName)
-                val cloudClassName = "$outDegreeName-$outClassName-$outYearName"
-
-                val cloudData =
-                    FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
-
-                AttendanceDataToCloud().insertAttendanceData(
-                    institutionId!!,
-                    departmentName,
-                    classType,
-                    cloudClassName,
-                    columnName,
-                    cloudData
+            val cloudData =
+                FetchDataForCloud().fetchDataForCloudInsertion(
+                    db,
+                    tableName,
+                    columnName
                 )
 
-                Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+            AttendanceDataToCloud().insertAttendanceData(
+                institutionId!!,
+                departmentName,
+                classType,
+                cloudClassName,
+                columnName,
+                cloudData
+            )
 
-            }.setNegativeButton("Cancel") { _, _ ->
-                dialog.dismiss()
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                startActivity(intent)
+            println(absentNumber)
+            Toast.makeText(this, "Attendance Submitted Successfully", Toast.LENGTH_LONG)
+                .show()
+
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+
+        } else {
+
+            for (absent in absentNumber) {
+                val contentValues1 = ContentValues()
+                contentValues1.put(columnName, actualAttendanceState)
+                db.update(
+                    tableName, contentValues1,
+                    "rollNo=?",
+                    arrayOf(absent)
+                )
             }
-        dialog = builder.create()
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.show()
+
+            val institutionId = utils.getInstitutionId(this)
+            val departmentName = utils.getDepartmentName(db, tableName)
+            val cloudClassName = "$outDegreeName-$outClassName-$outYearName"
+
+            val cloudData =
+                FetchDataForCloud().fetchDataForCloudInsertion(db, tableName, columnName)
+
+            AttendanceDataToCloud().insertAttendanceData(
+                institutionId!!,
+                departmentName,
+                classType,
+                cloudClassName,
+                columnName,
+                cloudData
+            )
+
+            Toast.makeText(this, "Attendance Updated", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
     }
 
     private fun updateCheckboxesBasedOnHour(columnName: String, actualAttendanceState: String) {

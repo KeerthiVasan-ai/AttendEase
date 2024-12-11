@@ -86,7 +86,6 @@ public class ProcessExcel {
                         }
                     }
                 }
-
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -154,7 +153,12 @@ public class ProcessExcel {
             case Cell.CELL_TYPE_BOOLEAN:
                 return value + cell.getBooleanCellValue();
             case Cell.CELL_TYPE_NUMERIC:
-                return value + BigDecimal.valueOf(cell.getNumericCellValue()).toPlainString();
+                double numericValue = cell.getNumericCellValue();
+                if (numericValue == Math.floor(numericValue)) {
+                    return value + (long) numericValue;
+                } else {
+                    return value + BigDecimal.valueOf(numericValue).toPlainString();
+                }
             case Cell.CELL_TYPE_STRING:
                 return value + cell.getStringCellValue();
             default:

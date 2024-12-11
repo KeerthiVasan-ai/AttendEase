@@ -7,6 +7,7 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
@@ -130,13 +131,21 @@ class ViewAttendance : AppCompatActivity() {
 
                 println(viewAttendanceData)
 
-                val resultData =
-                    ArrayList(viewAttendanceData.map { AttendanceData(it.key, it.value) })
-                val intent = Intent(this, ViewAttendanceList::class.java)
-                intent.putExtra("tableName", tableName)
-                intent.putExtra("attendanceType", vaAttendanceType)
-                intent.putExtra("resultData", resultData)
-                startActivity(intent)
+                if (viewAttendanceData.isEmpty()) {
+                    Toast.makeText(
+                        this,
+                        "No Attendance Found for the Particular Date",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    val resultData =
+                        ArrayList(viewAttendanceData.map { AttendanceData(it.key, it.value) })
+                    val intent = Intent(this, ViewAttendanceList::class.java)
+                    intent.putExtra("tableName", tableName)
+                    intent.putExtra("attendanceType", vaAttendanceType)
+                    intent.putExtra("resultData", resultData)
+                    startActivity(intent)
+                }
             }
         }
     }

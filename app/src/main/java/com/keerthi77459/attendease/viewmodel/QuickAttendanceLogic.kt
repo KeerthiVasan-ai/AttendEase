@@ -3,6 +3,7 @@ package com.keerthi77459.attendease.viewmodel
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.keerthi77459.attendease.utils.Utils
 
 class QuickAttendanceLogic(context: Context) {
@@ -20,17 +21,25 @@ class QuickAttendanceLogic(context: Context) {
     ) {
         mappedRoll = mapRoll.mapRoll()
         if (rollNoList.isNotEmpty()) {
-            println("Empty")
             for (rollNo in rollNoList) {
                 val className = "${tableName.replace("_", "-")}-R"
                 println(className)
                 val newRoll: String = when (rollNo.length) {
                     1 -> {
-                        mappedRoll[className] + "00" + rollNo
+                        if (mappedRoll[className]!!.trim().isEmpty()) {
+                            mappedRoll[className]!!.trim() + rollNo
+                        } else {
+                            mappedRoll[className] + "00" + rollNo
+
+                        }
                     }
 
                     2 -> {
-                        mappedRoll[className] + "0" + rollNo
+                        if (mappedRoll[className]!!.trim().isEmpty()) {
+                            mappedRoll[className]!!.trim() + rollNo
+                        } else {
+                            mappedRoll[className] + "0" + rollNo
+                        }
                     }
 
                     else -> {
@@ -38,6 +47,7 @@ class QuickAttendanceLogic(context: Context) {
                     }
                 }
                 val contentValues1 = ContentValues()
+                Log.d("TESTING", newRoll)
                 contentValues1.put(columnName, actualAttendanceState)
                 db.update(
                     tableName, contentValues1,
@@ -50,7 +60,6 @@ class QuickAttendanceLogic(context: Context) {
 
         if (lateralRollNoList.isNotEmpty()) {
             for (lateralRoll in lateralRollNoList) {
-
                 val className = "${tableName.replace("_", "-")}-LE"
                 println(className)
                 val newRoll: String = when (lateralRoll.length) {

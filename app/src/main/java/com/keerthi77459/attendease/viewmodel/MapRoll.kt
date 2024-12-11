@@ -17,9 +17,6 @@ class MapRoll(context: Context) {
     fun mapRoll(): MutableMap<String, String> {
 
         getRollDetails()
-        println(classNames)
-        println(rollNumbers)
-        println(lateralRollNumbers)
 
         for (index in classNames.indices) {
             rollMapping.put(classNames[index].plus("-R"), rollNumbers[index])
@@ -53,16 +50,21 @@ class MapRoll(context: Context) {
                 if (rollCursor.moveToFirst()) {
                     rollNumbers.add(rollCursor.getString(0).toString().dropLast(3))
                     rollCursor.close()
+                } else {
+                    rollNumbers.add(null.toString())
                 }
                 if (lateralCursor.moveToFirst()) {
                     lateralRollNumbers.add(lateralCursor.getString(0).toString().dropLast(3))
                     lateralCursor.close()
+                } else {
+                    lateralRollNumbers.add(null.toString())
                 }
 
 
                 classNames.add(
                     cursor.getString(1).toString() + "-" + cursor.getString(2).toString() +
-                            "-" + cursor.getString(3).toString() + "-" + cursor.getString(4).toString()
+                            "-" + cursor.getString(3).toString() + "-" + cursor.getString(4)
+                        .toString()
                 )
             }
 
